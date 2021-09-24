@@ -1,0 +1,69 @@
+/example:
+  $ref: ./token/index.yml
+
+/example/testing:
+  $ref: ./example/test.yml
+
+/slurm/session_info:
+  $ref: ./slurm/session_info.yml
+
+/slurm/access_token:
+  $ref: ./slurm/access_token.yml
+
+/slurm/end_session:
+  $ref: ./slurm/end_session.yml
+
+/slurm/preference:
+  $ref: ./slurm/preference.yml
+
+/slurm/exists:
+  $ref: ./slurm/exists.yml
+  # exists?access_token={access_token}
+
+/slurm/getprojects:
+  $ref: ./slurm/getprojects.yml
+  # getprojects?access_token={access_token}
+  
+/slurm/getusage:
+  $ref: ./slurm/getusage.yml
+  # getusage?access_token={access_token}
+
+/slurm/stop_process:
+  $ref: ./slurm/stop_process.yml
+  # stop?access_token={access_token}
+
+/slurm/execute_startserver:
+  $ref: ./slurm/execute_startserver.yml
+  # execute_startserver?access_token={access_token}
+
+/slurm/listall:
+  $ref: ./slurm/listall.yml
+  # listall?access_token={access_token}
+
+/slurm/exechost:
+  $ref: ./slurm/exechost.yml
+  # exechost?access_token={access_token}
+
+/vnc/display:
+  $ref: ./vnc/display.yml
+  # vncdisplay?access_token={access_token}
+
+/vnc/starttunnel:
+  $ref: ./vnc/starttunnel.yml
+  # starttunnel?access_token={access_token}
+
+/vnc/otp:
+  $ref: ./vnc/otp.yml
+  # otp?access_token={access_token}
+
+/slurm/running:
+  $ref: ./slurm/running.yml
+  # running?access_token={access_token}&jobidNumber=2
+
+/ssh/privatekey:
+  $ref: ./ssh/privatekey.yml
+  # privatekey?access_token={access_token}
+
+/group/projects:
+  $ref: ./group/projects.yml
+  # projects?access_token={access_token}
