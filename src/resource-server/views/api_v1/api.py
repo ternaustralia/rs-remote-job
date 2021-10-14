@@ -1,8 +1,6 @@
-from flask import jsonify
+from flask import jsonify, request
 from flask_tern import openapi
 from flask_tern.auth import current_user, require_user
-from flask_tern.logging import create_audit_event, log_audit
-from resource-server.models import Example, db
 
 from .blueprint import bp
 from classes.commands import Commands
@@ -10,35 +8,86 @@ from classes.commands import Commands
 cmd = Commands()
 
 
-@bp.route("/example")
+@bp.route("/slurm/exists", methods=['GET'])
 @openapi.validate()
-def example_get():
-    log_audit(create_audit_event("increment", "success"))
-    counter = db.session.query(Example).first()
-    if not counter:
-        counter = Example(count=0)
-        db.session.add(counter)
-    counter.count += 1
-    db.session.commit()
-    return jsonify({"counter": counter.count})
+def slurm_users_exists():
+    """ Check if user exists in the masternode
+        1. Check current acces_token
+        2. Connect with paramiko to the master node, if it fails, request new certificate
+        3. Check if user exists, if it fails create a new one
+    """
 
-@bp.route("/slurm/exists")
-@openapi.validate()
-def check_users_exists():
-    """ Call the signing k"""
+    access_token = request.openapi.parameters.query.get('access_token')
+
     response =  cmd.user_exists()
     return response
 
-
-@bp.route("/example/<name>", methods=["POST"])
-@require_user
+@bp.route("/slurm/projects", methods=['GET'])
 @openapi.validate()
-def hello_post(name):
-    counter = db.session.query(Example).first()
-    return jsonify(
-        {
-            "name": name,
-            "counter": counter.count,
-            "current_user": dict(current_user),
-        }
-    )
+def slurm_projects():
+    """ Not description yet """
+
+    access_token = request.openapi.parameters.query.get('access_token')
+
+    response =  jsonify({})
+    return response
+
+@bp.route("/slurm/usage", methods=['GET'])
+@openapi.validate()
+def slurm_usage():
+    """ Not description yet """
+
+    access_token = request.openapi.parameters.query.get('access_token')
+
+    response =  jsonify({})
+    return response
+
+@bp.route("/slurm/stopprocess", methods=['GET'])
+@openapi.validate()
+def slurm_stop_process():
+    """ Not description yet """
+
+    access_token = request.openapi.parameters.query.get('access_token')
+
+    response =  jsonify({})
+    return response
+
+@bp.route("/slurm/startserver", methods=['GET'])
+@openapi.validate()
+def slurm_start_server():
+    """ Not description yet """
+
+    access_token = request.openapi.parameters.query.get('access_token')
+
+    response =  jsonify({})
+    return response
+
+@bp.route("/slurm/listall", methods=['GET'])
+@openapi.validate()
+def slurm_list_all():
+    """ Not description yet """
+
+    access_token = request.openapi.parameters.query.get('access_token')
+
+    response =  jsonify({})
+    return response
+
+@bp.route("/slurm/exechost", methods=['GET'])
+@openapi.validate()
+def slurm_exec_host():
+    """ Not description yet """
+
+    access_token = request.openapi.parameters.query.get('access_token')
+
+    response =  jsonify({})
+    return response
+
+@bp.route("/slurm/running", methods=['GET'])
+@openapi.validate()
+def slurm_running():
+    """ Not description yet """
+
+    access_token = request.openapi.parameters.query.get('access_token')
+
+    response =  jsonify({})
+    return response

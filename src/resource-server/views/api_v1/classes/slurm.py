@@ -1,0 +1,2 @@
+class Slurm:
+    pass

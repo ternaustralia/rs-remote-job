@@ -1,4 +1,11 @@
+oparameters:
+  - name: access_token
+    in: query
+    description: signed certificate
+    schema:
+      type: string
 
+options:
   $ref: ./../../config/methods/options.yml
 
 get:
