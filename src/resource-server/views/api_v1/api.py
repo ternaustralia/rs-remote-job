@@ -5,6 +5,9 @@ from flask_tern.logging import create_audit_event, log_audit
 from resource-server.models import Example, db
 
 from .blueprint import bp
+from classes.commands import Commands
+
+cmd = Commands()
 
 
 @bp.route("/example")
@@ -18,6 +21,13 @@ def example_get():
     counter.count += 1
     db.session.commit()
     return jsonify({"counter": counter.count})
+
+@bp.route("/slurm/exists")
+@openapi.validate()
+def check_users_exists():
+    """ Call the signing k"""
+    response =  cmd.user_exists()
+    return response
 
 
 @bp.route("/example/<name>", methods=["POST"])
