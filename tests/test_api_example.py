@@ -5,7 +5,7 @@ import pytest
 
 @pytest.fixture
 def test_data(app):
-    from resource-server import models 
+    from resource_server import models 
 
     with app.app_context():
         models.db.session.add(models.Example(count=5))

@@ -13,7 +13,7 @@ Welcome to RS
 Configuration
 -------------
 
-The environment variable prefix is set to ``RESOURCE-SERVER_``. All env vars prefixed with this are considered as configuration option.
+The environment variable prefix is set to ``RESOURCE_SERVER_``. All env vars prefixed with this are considered as configuration option.
 (See :doc:`flasktern:index`. )
 
 

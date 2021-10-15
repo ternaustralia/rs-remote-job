@@ -49,8 +49,8 @@ RUN pip install --no-cache-dir /workspace/dist/*.whl
 FROM alpine:${ALPINE_VERSION} as runner
 
 # # create app user and group
-RUN addgroup -g 1000 resource-server \
-  && adduser -h /opt/venv -g 'RS' -G resource-server -D -H -u 1000 resource-server
+RUN addgroup -g 1000 resource_server \
+  && adduser -h /opt/venv -g 'RS' -G resource_server -D -H -u 1000 resource_server
 
 # Binary pkgs and other pkgs hard or slow to install from source
 RUN apk add --no-cache \
@@ -69,7 +69,7 @@ ENV VIRTUALENV=/opt/venv \
 COPY build-files/docker_entrypoint.sh /docker_entrypoint.sh
 
 # set default env for flask app
-ENV FLASK_APP=resource-server \
+ENV FLASK_APP=resource_server \
   FLASK_ENV=production
 
 USER 1000
@@ -77,6 +77,6 @@ USER 1000
 # TODO: setup ENTRYPOINT if needed and default CMD
 ENTRYPOINT ["/docker_entrypoint.sh"]
 
-# CMD ["gunicorn", "--bind=:5000", "--workers=2", "--threads=4", "--forwarded-allow-ips='*'",  "--statsd-host=statsd-exporter.services:9125", "--statsd-prefix=ecoimages_portal_api", "resource-server:create_app()"]
+# CMD ["gunicorn", "--bind=:5000", "--workers=2", "--threads=4", "--forwarded-allow-ips='*'",  "--statsd-host=statsd-exporter.services:9125", "--statsd-prefix=ecoimages_portal_api", "resource_server:create_app()"]
 
-CMD ["gunicorn", "--bind=:5000", "--forwarded-allow-ips='*'",  "resource-server:create_app()"]
+CMD ["gunicorn", "--bind=:5000", "--forwarded-allow-ips='*'",  "resource_server:create_app()"]
