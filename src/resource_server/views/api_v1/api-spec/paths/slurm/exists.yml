@@ -1,0 +1,32 @@
+oparameters:
+  - name: access_token
+    in: query
+    description: signed certificate
+    schema:
+      type: string
+
+ptions:
+  $ref: ./../../config/methods/options.yml
+
+get:
+  summary: Check if user exists
+  description: Check if user exists in the virtual machine or LDAP
+  responses:
+    '200':
+      description: OK
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: "string"
+      content:
+        application/json:
+          schema:
+            type: object
+    '400':
+      $ref: ./../../components/responses/forbidden.yml
+    '401':
+      $ref: ./../../components/responses/unauthorized.yml
+    '403':
+      $ref: ./../../components/responses/bad_request.yml
+    '500':
+      $ref: ./../../components/responses/internal_error.yml
