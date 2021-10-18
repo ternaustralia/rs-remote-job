@@ -1,9 +1,11 @@
+from _typeshed import Self
 import json
 from typing import Dict
 import paramiko
 from paramiko.ssh_exception import SSHException
 
 from constants import MASTER_NODE_HOST, MASTER_NODE_PORT, MASTER_NODE_USER, COMMANDS_JSON_FILE
+from signing_api import SigningKey
 
 
 def paramiko_stablish_connection(file, password: str = ''):
@@ -26,7 +28,9 @@ def paramiko_stablish_connection(file, password: str = ''):
         ssh_key = paramiko.RSAKey.from_private_key(file_obj=file, password=password)
     except SSHException: 
         # Request a new ssh_key certificate
-        raise SSHException
+        signing = SigningKey()
+        keys = signing.get_keys()
+        return paramiko_stablish_connection(keys.get('cert_key'))
 
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(

@@ -61,7 +61,7 @@
             ],
             "requireMatch": true
         },
-        "execHost": {
+        "exec_host": {
             "async": false,
             "cmd": "\"/opt/slurm-14.11.6/bin/squeue -j {jobidNumber} -o \"%N\" | tail -n -1 | cut -f 1 -d ',' | xargs -iname getent hosts name | cut -f 1 -d ' ' \"",
             "failFatal": true,
@@ -73,7 +73,7 @@
             ],
             "requireMatch": true
         },
-        "getProjects": {
+        "projects": {
             "async": false,
             "cmd": "\"groups | sed 's@ @\\n@g'\"",
             "failFatal": true,
@@ -85,7 +85,7 @@
             ],
             "requireMatch": true
         },
-        "listAll": {
+        "list_all": {
             "async": false,
             "cmd": "/opt/slurm-14.11.6/bin/squeue -u `whoami` -o \\\"%i %L\\\" | tail -n -1",
             "failFatal": true,
@@ -121,7 +121,7 @@
             ],
             "requireMatch": true
         },
-        "startServer": {
+        "start_server": {
             "async": false,
             "cmd": "mkdir -p ~/.vnc ; rm -f ~/.vnc/clearpass ; touch ~/.vnc/clearpass ; chmod 600 ~/.vnc/clearpass ; passwd=$( dd if=/dev/urandom bs=1 count=8 2>/dev/null | md5sum | cut -b 1-8 ) ; echo $passwd > ~/.vnc/clearpass ; cat ~/.vnc/clearpass | vncpasswd -f > ~/.vnc/passwd ; chmod 600 ~/.vnc/passwd ; echo -e '#!/bin/bash\n /opt/singularity/bin/singularity exec -B /nfs/home/EcoStore:/home/EcoStore,/nfs/home/OzFlux:/home/OzFlux,/nfs/home/public_share_data:/home/public_share_data,/nfs/home/public_share_workflow:/home/public_share_workflow /nfs/home/public_share_data/installers/coesra-containers/{container} vncserver; sleep 36000000 ' | /opt/slurm-14.11.6/bin/sbatch -p batch -s -n 1 -c {ppn} --mem={mem}gb --time={hours}:00:00 -J desktop_'test' -o .vnc/slurm-%j.out; echo /nfs/home/public_share_data/installers/coesra-containers/{container} > ~/.vnc/containerpath",
             "failFatal": true,
@@ -133,7 +133,7 @@
             ],
             "requireMatch": true
         },
-        "currentContainer": {
+        "current_container": {
             "async": false,
             "cmd": "cat ~/.vnc/containerpath",
             "failFatal": true,
@@ -145,7 +145,7 @@
             ],
             "requireMatch": true
         },
-        "getContainers": {
+        "containers": {
             "async": true,
             "cmd": "\"ls -1r /nfs/home/public_share_data/installers/coesra-containers | sed 's@ @\\n@g' | sort -r \"",
             "failFatal": true,
@@ -157,7 +157,7 @@
             ],
             "requireMatch": true
         },
-        "getCpuinfo": {
+        "cpu_info": {
             "async": false,
             "cmd": "/opt/slurm-14.11.6/bin/scontrol -o show nodes | awk '{print $1, $4,$6}' |grep 'centos' ",
             "failFatal": true,
@@ -169,7 +169,7 @@
             ],
             "requireMatch": true
         },
-        "getMeminfo": {
+        "mem_info": {
             "async": false,
             "cmd": "/opt/slurm-14.11.6/bin/scontrol -o show nodes | awk '{print $1, $15,$14}' |grep 'centos' ",
             "failFatal": true,
@@ -181,7 +181,7 @@
             ],
             "requireMatch": true
         },
-        "getUptime": {
+        "up_time": {
             "async": false,
             "cmd": "/opt/slurm-14.11.6/bin/scontrol -o show nodes | awk '{print $1, $18,$22}' |grep 'centos' ",
             "failFatal": true,
@@ -193,7 +193,7 @@
             ],
             "requireMatch": true
         },
-        "getDiskspace": {
+        "diskspace": {
             "async": false,
             "cmd": "df -h /nfs |awk '{print $2, $3, $4, $5}' |sed -n 2p ",
             "failFatal": true,
@@ -205,7 +205,7 @@
             ],
             "requireMatch": true
         },
-        "getUsage": {
+        "usage": {
             "async": true,
             "cmd": "/opt/slurm-14.11.6/bin/sacct -n -j all -u `whoami` --format=jobid,alloccpus,cputime,reqmem,start,end,elapsed |tr -s ' ' |grep -vwE '(Unknown|batch)'|tail -5 | sort -r -k1 -n",
             "failFatal": true,
@@ -217,7 +217,7 @@
             ],
             "requireMatch": true
         },
-        "runKeplerDesktop": {
+        "run_kepler_desktop": {
             "async": false,
             "cmd": "\"/opt/kepler/kepler-2.4/kepler.sh {params} {workflow} &\"",
             "failFatal": true,
@@ -229,7 +229,7 @@
             ],
             "requireMatch": true
         },
-        "runKeplerHeadless": {
+        "run_kepler_headless": {
             "async": false,
             "cmd": "echo -e '#!/bin/bash \n/opt/kepler/kepler-2.4/kepler.sh -runwf -nogui {params} {workflow}' | /opt/slurm-14.11.6/bin/sbatch -p batch -N '1' -n '1' --time='48':00:00 -J desktop_'hoangnguyen' -o .vnc/slurm-%j.out",
             "failFatal": true,
@@ -241,7 +241,7 @@
             ],
             "requireMatch": true
         },
-        "stop": {
+        "stop_process": {
             "async": false,
             "cmd": "\"/opt/slurm-14.11.6//bin/scancel {jobidNumber}\"",
             "failFatal": true,
@@ -253,7 +253,7 @@
             ],
             "requireMatch": false
         },
-        "stopForRestart": {
+        "stop_for_restart": {
             "async": false,
             "cmd": "\"scancel {jobidNumber}\"",
             "failFatal": true,
@@ -265,7 +265,7 @@
             ],
             "requireMatch": false
         },
-        "tunnel": {
+        "start_tunnel": {
             "async": true,
             "cmd": "{sshBinary} -A -c {cipher} -t -t -oStrictHostKeyChecking=no -L {localPortNumber}:localhost:{remotePortNumber} -l {username} {execHost} \"echo tunnel_hello; bash\"",
             "failFatal": true,
@@ -277,7 +277,7 @@
             ],
             "requireMatch": true
         },
-        "vncDisplay": {
+        "display": {
             "async": false,
             "cmd": "\"cat .vnc/slurm-{jobidNumber}.out\"",
             "failFatal": true,
@@ -289,7 +289,7 @@
             ],
             "requireMatch": true
         },
-        "sshPrivateKey": {
+        "ssh_private_key": {
             "async": false,
             "cmd": "[ ! -f ~/.ssh/authorized_keys ] && touch ~/.ssh/authorized_keys;[ ! -f ~/.ssh/coesra ] && ssh-keygen -q -t rsa -f ~/.ssh/coesra -N '' && cat ~/.ssh/coesra.pub >> ~/.ssh/authorized_keys; tr '\n' ':' < ~/.ssh/coesra",
             "failFatal": true,
