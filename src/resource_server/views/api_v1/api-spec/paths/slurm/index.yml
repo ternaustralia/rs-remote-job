@@ -1,0 +1,46 @@
+parameters:
+  - name: endpoint
+    in: path
+    description: Fetch and execute different commands available for slurm
+    required: true
+    schema:
+      type: string
+      enum:
+        - exists
+        - projects
+        - usage
+        - stopprocess
+        - startserver
+        - listall
+        - exechost
+        - running
+        - accesstoken
+        - endsession
+        - preference
+        - sessioninfo
+
+options:
+  $ref: ./../../config/methods/options.yml
+
+get:
+  summary: Execute host
+  description: Execute host
+  responses:
+    '200':
+      description: OK
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: "string"
+      content:
+        application/json:
+          schema:
+            type: object
+    '400':
+      $ref: ./../../components/responses/forbidden.yml
+    '401':
+      $ref: ./../../components/responses/unauthorized.yml
+    '403':
+      $ref: ./../../components/responses/bad_request.yml
+    '500':
+      $ref: ./../../components/responses/internal_error.yml
