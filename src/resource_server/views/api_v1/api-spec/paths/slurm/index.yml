@@ -9,15 +9,15 @@ parameters:
         - exists
         - projects
         - usage
-        - stopprocess
-        - startserver
-        - listall
-        - exechost
+        - stop_process
+        - start_server
+        - list_all
+        - exec_host
         - running
         - accesstoken
-        - endsession
+        - end_session
         - preference
-        - sessioninfo
+        - session_info
 
 options:
   $ref: ./../../config/methods/options.yml

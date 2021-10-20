@@ -2,20 +2,30 @@ from flask import jsonify, request
 from flask_tern import openapi
 from flask_tern.auth import current_user, require_user
 
-from .blueprint import bp
-from .classes.slurm import Slurm
-slurm = Slurm('here is the pkey')
+from resource_server.views.api_v1.blueprint import bp
+from resource_server.views.api_v1.classes.cmd import CMD
 
 
 @bp.route("/slurm/<endpoint>", methods=["GET"])
 @require_user
 @openapi.validate()
 def slurm(endpoint):
-    """ Check if user exists in the masternode
-        1. Check current acces_token
-        2. Connect with paramiko to the master node, if it fails, request new certificate
-        3. Check if user exists, if it fails create a new one
-    """
+    cmd = CMD()
+    response = cmd.execute(endpoint)
+    return jsonify({response})
 
-    response =  slurm.execute(endpoint)
-    return response
+@bp.route("/vnc/<endpoint>", methods=["GET"])
+@require_user
+@openapi.validate()
+def vnc(endpoint):
+    cmd = CMD()
+    response = cmd.execute(endpoint)
+    return jsonify({response})
+
+@bp.route("/group/<endpoint>", methods=["GET"])
+@require_user
+@openapi.validate()
+def group(endpoint):
+    cmd = CMD()
+    response = cmd.execute(endpoint)
+    return jsonify({response})

@@ -2,12 +2,13 @@ parameters:
   - name: endpoint
     in: path
     description: Fetch and execute different commands available for slurm
+    required: true
     schema:
       type: string
       enum:
         - display
         - opt
-        - starttunnel
+        - start_tunnel
 
 options:
   $ref: ./../../config/methods/options.yml

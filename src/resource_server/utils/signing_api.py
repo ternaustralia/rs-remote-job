@@ -2,7 +2,7 @@ from typing import Dict
 import requests
 import json
 
-from constants import BASE_URL 
+from resource_server.utils.constants import BASE_URL 
 
 
 class SigningKey:

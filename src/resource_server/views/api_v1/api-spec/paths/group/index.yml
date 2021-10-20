@@ -1,9 +1,12 @@
-oparameters:
-  - name: access_token
-    in: query
-    description: signed certificate
+parameters:
+  - name: endpoint
+    in: path
+    description: Fetch and execute different commands available for group
+    required: true
     schema:
       type: string
+      enum:
+        - projects
 
 options:
   $ref: ./../../config/methods/options.yml
