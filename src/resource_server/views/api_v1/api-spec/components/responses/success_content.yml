@@ -1,5 +1,5 @@
 description: OK
-headers:
-  Access-Control-Allow-Origin:
+content:
+  application/json:
     schema:
-      type: "string"
+      type: object

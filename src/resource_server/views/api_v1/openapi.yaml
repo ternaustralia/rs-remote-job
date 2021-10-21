@@ -49,36 +49,12 @@ paths:
             - end_session
             - preference
             - session_info
-    options:
-      summary: Request options
-      responses:
-        '200':
-          description: 200 response
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-            Access-Control-Allow-Methods:
-              schema:
-                type: string
-            Access-Control-Allow-Headers:
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                title: Empty Schema
-                type: object
     get:
       summary: Execute host
       description: Execute host
       responses:
         '200':
           description: OK
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
           content:
             application/json:
               schema:
@@ -103,36 +79,12 @@ paths:
             - display
             - opt
             - start_tunnel
-    options:
-      summary: Request options
-      responses:
-        '200':
-          description: 200 response
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-            Access-Control-Allow-Methods:
-              schema:
-                type: string
-            Access-Control-Allow-Headers:
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                title: Empty Schema
-                type: object
     get:
       summary: display vnc data
       description: display vnc data
       responses:
         '200':
           description: OK
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
           content:
             application/json:
               schema:
@@ -155,36 +107,12 @@ paths:
           type: string
           enum:
             - projects
-    options:
-      summary: Request options
-      responses:
-        '200':
-          description: 200 response
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-            Access-Control-Allow-Methods:
-              schema:
-                type: string
-            Access-Control-Allow-Headers:
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                title: Empty Schema
-                type: object
     get:
       summary: group projects
       description: group projects
       responses:
         '200':
           description: OK
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
           content:
             application/json:
               schema:

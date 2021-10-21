@@ -4,10 +4,10 @@ import paramiko
 import tempfile
 
 from resource_server.utils.constants import MASTER_NODE_HOST, MASTER_NODE_PORT, MASTER_NODE_USER, COMMANDS_JSON_FILE
-from resource_server.utils.signing_api import SigningKey
+from resource_server.utils.signing_api import get_keys
 
 
-def paramiko_stablish_connection():
+def paramiko_establish_connection():
     """ User paramiko to stablish a connection to the master node
         Parameters
         -------------
@@ -17,8 +17,7 @@ def paramiko_stablish_connection():
     """
     ssh = paramiko.SSHClient()
 
-    signing = SigningKey()
-    keys = signing.get_keys()
+    keys = get_keys()
 
     # Create temporary dicrectory and storage the keys there
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -35,6 +34,7 @@ def paramiko_stablish_connection():
         ssh_key = paramiko.RSAKey.from_private_key_file(keys_path)
         ssh_key.load_certificate(f"{keys_path}-cert.pub")
 
+    # TODO: note, that we should use host key verification in some way.
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(
             hostname=MASTER_NODE_HOST,

@@ -2,7 +2,7 @@ import unittest
 import paramiko
 
 from resource_server.utils.constants import MASTER_NODE_HOST, MASTER_NODE_PORT, MASTER_NODE_USER 
-from resource_server.utils.commond import paramiko_stablish_connection, read_json_file
+from resource_server.utils.commond import paramiko_establish_connection, read_json_file
 
 class TestUtilsCommond(unittest.TestCase):
 

@@ -8,23 +8,12 @@ parameters:
       enum:
         - projects
 
-options:
-  $ref: ./../../config/methods/options.yml
-
 get:
   summary: group projects  
   description: group projects 
   responses:
     '200':
-      description: OK
-      headers:
-        Access-Control-Allow-Origin:
-          schema:
-            type: "string"
-      content:
-        application/json:
-          schema:
-            type: object
+      $ref: ./../../components/responses/success_content.yml
     '400':
       $ref: ./../../components/responses/forbidden.yml
     '401':

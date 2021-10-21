@@ -1,4 +1,4 @@
-oparameters:
+parameters:
   - name: access_token
     in: query
     description: signed certificate
