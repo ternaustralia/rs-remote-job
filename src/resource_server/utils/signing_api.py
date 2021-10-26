@@ -8,7 +8,7 @@ from resource_server.utils.constants import BASE_URL
 def get_keys():
     """ Call signing key api and generate a new public, private and cert keys """
     # Prepare url
-    url = f'{BASE_URL}/token'
+    url = f"{BASE_URL}/token"
     # Prepare query
     params = {}
 
@@ -17,11 +17,11 @@ def get_keys():
 def check_signature(public_key: str, cert_key: str):
     """ Check if the certificate key is valid """
     # Prepare url
-    url = f'{BASE_URL}/token/signing'
+    url = f"{BASE_URL}/token/signing"
     # Prepare query
     params = { 
-        'cert_key': cert_key, 
-        'public_key': public_key
+        "cert_key": cert_key, 
+        "public_key": public_key
     }
 
     return _post_request(url, params)

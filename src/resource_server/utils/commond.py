@@ -16,7 +16,6 @@ def paramiko_establish_connection():
         ssh
     """
     ssh = paramiko.SSHClient()
-
     keys = get_keys()
 
     # Create temporary dicrectory and storage the keys there
@@ -25,9 +24,9 @@ def paramiko_establish_connection():
         tmp_public = open(f"{keys_path}.pub", "w")
         tmp_private = open(f"{keys_path}", "w")
         tmp_cert = open(f"{keys_path}-cert.pub", "w")
-        tmp_public.write(keys.get('public_key'))
-        tmp_private.write(keys.get('private_key'))
-        tmp_cert.write(keys.get('cert_key'))
+        tmp_public.write(keys.get("public_key"))
+        tmp_private.write(keys.get("private_key"))
+        tmp_cert.write(keys.get("cert_key"))
         tmp_public.close()
         tmp_private.close()
         tmp_cert.close()

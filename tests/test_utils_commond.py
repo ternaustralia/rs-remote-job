@@ -13,17 +13,8 @@ class TestUtilsCommond(unittest.TestCase):
         self.assertIsInstance(json_data, dict)
         self.assertIsNotNone(json_data.get('Commands'))
 
-    def test_paramiko_local_connection(self):
-        """ Check if paramiko can connect with local host keys """
+    def test_paramiko_stablish_connection(self):
+        """ Check if paramiko can connect with the host """
 
-        ssh = paramiko.SSHClient()
-        ssh.load_system_host_keys()
-
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(
-                hostname=MASTER_NODE_HOST,
-                username=MASTER_NODE_USER,
-                port=MASTER_NODE_PORT,
-            )
-
+        ssh = paramiko_establish_connection()
         self.assertIsInstance(ssh, paramiko.SSHClient)

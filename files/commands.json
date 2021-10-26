@@ -249,6 +249,15 @@
             "loop": false,
             "regex": "^(?P<privateKey>.*)$",
             "requireMatch": true
+        },
+        "test_command": {
+            "async": false,
+            "cmd": "ls -la && pwd",
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "login",
+            "loop": false,
+            "requireMatch": true
         }
     }
 }
