@@ -1,5 +1,5 @@
 import packaging.version
-from resource-server.version import version
+from resource_server.version import version
 
 # from pallets_sphinx_themes import get_version
 # from pallets_sphinx_themes import ProjectLink
@@ -71,7 +71,7 @@ html_theme_options = {
 html_context = {
     "display_bitbucket": True,  # Integrate Bitbucket
     "bitbucket_user": "terndatateam", # Username
-    "bitbucket_repo": "resource-server", # Repo name
+    "bitbucket_repo": "resource_server", # Repo name
     "bitbucket_version": "master", # Version
     "conf_py_path": "/docs/",  # Path in the checkout to the docs root
 }

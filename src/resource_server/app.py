@@ -3,21 +3,20 @@ import os.path
 
 from flask import Flask, redirect, url_for
 from flask_cors import CORS
-from flask_migrate import Migrate
 from flask_tern import logging as app_logging
 from flask_tern.utils.config import load_settings
 
 # from flask_tern.utils.json import TernJSONEncoder
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from resource-server.version import version
+from resource_server.version import version
 
 
 def create_app(config=None) -> Flask:
     ###################################################
     # Setup Flask App
     ###################################################
-    app = Flask("resource-server")
+    app = Flask("resource_server")
     app.config["VERSION"] = version
 
     ###################################################
@@ -29,9 +28,9 @@ def create_app(config=None) -> Flask:
     # Configure application
     ################################################################
     # load defaults
-    from resource-server import settings
+    from resource_server import settings
 
-    load_settings(app, env_prefix="RESOURCE-SERVER_", defaults=settings, config=config)
+    load_settings(app, env_prefix="RESOURCE_SERVER_", defaults=settings, config=config)
 
     ################################################################
     # Configure logging
@@ -44,16 +43,6 @@ def create_app(config=None) -> Flask:
     from flask_tern import cache
 
     cache.init_app(app)
-
-    #################################################################
-    # Configure sqlalchemy ad alembic
-    #################################################################
-    # Register extensions
-    from flask_tern import db
-
-    # api.init_app(app)
-    db.init_app(app)
-    Migrate(app, db.db, directory=os.path.join(app.config.root_path, "migrations"))
 
     ###############################################
     # Session setup
@@ -108,7 +97,7 @@ def create_app(config=None) -> Flask:
     app.register_blueprint(oidc_login, url_prefix="/api/oidc")
 
     # register api blueprints
-    from resource-server.views import api_v1, home
+    from resource_server.views import api_v1, home
 
     app.register_blueprint(home.bp, url_prefix="/api")
     app.register_blueprint(api_v1.bp, url_prefix="/api/v1.0")

@@ -6,7 +6,7 @@ definitions:
     - step: &envstep
       # use a multiline step to set environment variables
       - script: &setenv |
-          export IMAGE_NAME=ternau/resource-server
+          export IMAGE_NAME=ternau/resource_server
 
     - step: &build-test
         script:

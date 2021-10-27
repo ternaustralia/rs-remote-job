@@ -1,0 +1,59 @@
+openapi: 3.0.1
+info:
+  version: 1.0.0
+  title: '${title}'
+  description: '${description}'
+  contact:
+    email: tern@uq.com.au
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+    OpenID:
+      type: openIdConnect
+      openIdConnectUrl: >-
+        https://auth-test.tern.org.au/auth/realms/local/.well-known/openid-configuration
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+security:
+  - BasicAuth: []
+  - BearerAuth: []
+  - OpenID: []
+  - ApiKeyAuth: []
+tags: []
+paths:
+  /cmd:
+    parameters:
+      - name: endpoint
+        in: path
+        description: Fetch and execute different commands available in the commands file
+        required: true
+        schema:
+          type: array
+          items:
+            type: string
+    get:
+      summary: Execute host
+      description: Execute host
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Forbidden
+        '401':
+          description: Unauthorized
+        '403':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+

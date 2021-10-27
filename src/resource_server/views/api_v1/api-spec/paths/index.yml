@@ -1,0 +1,3 @@
+/cmd:
+  $ref: ./cmd/index.yml
+

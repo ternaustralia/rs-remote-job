@@ -11,7 +11,7 @@ Installation
 
 .. code:: bash
 
-    pip install resource-server
+    pip install resource_server
 
 
 Configuration
@@ -22,7 +22,7 @@ The application can configured like any other Flask application.
 First it will load the bundled `settings.py` file to configure sensible defaults.
 Please see `settings.py` and https://terndatateam.bitbucket.io/flask_tern/ for details.
 
-Next it will look for an environment variable `RESOURCE-SERVER_SETTINGS`. This environment variable
+Next it will look for an environment variable `RESOURCE_SERVER_SETTINGS`. This environment variable
 should point to a python file which will be loaded as well. The format is exactly the same as in `settings.py` .
 
 This project uses ``flask_tern``. Be sure to check documentation and code https://bitbucket.org/terndatateam/flask_tern .
@@ -50,7 +50,7 @@ The same can be done within a docker environment. The following is a simple exam
 
 .. code:: bash
 
-    docker run --rm -it -p 5000:5000 -v "$(pwd)":/resource-server -w /resource-server alpine:3.10 sh
+    docker run --rm -it -p 5000:5000 -v "$(pwd)":/resource_server -w /resource_server alpine:3.10 sh
     # install python in binary libs in container
     apk add python3 py3-cryptography
     # install pkg in container
@@ -78,7 +78,7 @@ Database management
 The project uses Flask-Migrate to manage databes schemas.
 Flask-Migrate uses Alembic to manage database migrations. As a first step it is
 necessary to initialise the Alembic configuration with `flask db init`. This will create a
-module `resource-server.migrations` with the necessarry settings and boilerplate for Alembic.
+module `resource_server.migrations` with the necessarry settings and boilerplate for Alembic.
 Whenever there are changes to the database models, it is necessary to create a new migration step and apply this migration to the database.
 Per default the development environment uses sqlite as database backend, but this can easily be change by reconfiguring Flask-SQLAlchemy.
 

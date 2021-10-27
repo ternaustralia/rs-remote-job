@@ -22,10 +22,10 @@ docs_require = [
 ]
 
 setup(
-    name="resource-server",
+    name="resource_server",
     use_scm_version={
         # put a version file into module on build to simplify pkg version discovery
-        "write_to": "src/resource-server/version.py",
+        "write_to": "src/resource_server/version.py",
         "fallback_version": "0.0.0.dev0",
     },
     setup_requires=["setuptools_scm"],
@@ -52,7 +52,7 @@ setup(
     install_requires=requires,
     entry_points={
         # "paste.app.factory": [
-        #     "main = resource-server:main",
+        #     "main = resource_server:main",
         # ],
     },
 )
