@@ -1,10 +1,10 @@
 import json
-from typing import Dict
 import paramiko
 import tempfile
 
-from resource_server.utils.constants import MASTER_NODE_HOST, MASTER_NODE_PORT, MASTER_NODE_USER, COMMANDS_JSON_FILE
+from typing import Dict
 from resource_server.utils.signing_api import get_keys
+from resource_server.settings import MASTER_NODE_HOST, MASTER_NODE_PORT, MASTER_NODE_USER, COMMANDS_JSON_FILE
 
 
 def paramiko_establish_connection():
