@@ -1,7 +1,7 @@
 import unittest
 import paramiko
 
-from resource_server.utils.commond import paramiko_establish_connection, read_json_file
+from resource_server.utils.common import paramiko_establish_connection, read_json_file
 
 class TestUtilsCommond(unittest.TestCase):
 

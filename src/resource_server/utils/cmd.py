@@ -1,7 +1,7 @@
 import re
 from paramiko import SSHClient
 
-from resource_server.utils.commond import read_json_file
+from resource_server.utils.common import read_json_file
 
 
 def execute_command(ssh: SSHClient, endpoint: str) -> dict: 

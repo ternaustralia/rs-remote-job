@@ -1,6 +1,6 @@
 import unittest
 
-from resource_server.utils.commond import paramiko_establish_connection
+from resource_server.utils.common import paramiko_establish_connection
 from resource_server.utils.cmd import execute_command
 
 class TestClassesCMD(unittest.TestCase):
