@@ -7,26 +7,10 @@ from resource_server.utils.cmd import execute_command
 from resource_server.utils.commond import paramiko_establish_connection
 
 
-@bp.route("/slurm/<endpoint>", methods=["GET"])
+@bp.route("/cmd/<endpoint>", methods=["GET"])
 @require_user
 @openapi.validate()
-def slurm(endpoint):
-    ssh = paramiko_establish_connection()
-    response = execute_command(ssh, endpoint)
-    return jsonify({response})
-
-@bp.route("/vnc/<endpoint>", methods=["GET"])
-@require_user
-@openapi.validate()
-def vnc(endpoint):
-    ssh = paramiko_establish_connection()
-    response = execute_command(ssh, endpoint)
-    return jsonify({response})
-
-@bp.route("/group/<endpoint>", methods=["GET"])
-@require_user
-@openapi.validate()
-def group(endpoint):
+def cmd(endpoint):
     ssh = paramiko_establish_connection()
     response = execute_command(ssh, endpoint)
     return jsonify({response})

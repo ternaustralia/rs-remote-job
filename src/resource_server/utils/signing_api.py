@@ -2,8 +2,7 @@ from typing import Dict
 import requests
 import json
 
-from resource_server.utils.constants import BASE_URL 
-
+from resource_server.settings import BASE_URL
 
 def get_keys():
     """ Call signing key api and generate a new public, private and cert keys """

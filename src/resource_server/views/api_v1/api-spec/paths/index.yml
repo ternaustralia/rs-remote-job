@@ -1,8 +1,3 @@
-/slurm:
-  $ref: ./slurm/index.yml
+/cmd:
+  $ref: ./cmd/index.yml
 
-/vnc:
-  $ref: ./vnc/index.yml
-
-/group:
-  $ref: ./group/index.yml
