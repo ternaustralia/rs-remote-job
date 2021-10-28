@@ -1,0 +1,28 @@
+{
+    "parameters": [
+        {"name": "login", "type": "string", "default": ""},
+        {"name": "var2","type": "int", "default": 1}    
+    ],
+    "endpoints": [
+        {
+            "name": "example1",
+            "async": false,
+            "httpMethod": "POST", 
+            "exec": {
+                "parameters":[
+                    {"name": "param1", "type": "int", "default": 1},
+                    {"name": "param2", "type": "string", "default": ""}
+                ],
+                "command": "/path/to/binary {param1} {param2} {var2}"
+            },
+            "output": {
+                "type": "regex/string",
+                "value": "(?P<name>[a-zA-Z0-9_]+),(?P<type>[a-zA-Z0-9_]+),(?P<jsonconfig>.*),(?P<amqpuri>.*),(?P<amqpcert>.*),(?P<amqpnoverifypeer>.*),(?P<amqpnoverifyhost>.*),(?P<uri>.*),(?P<cert>.*),(?P<noverifypeer>.*),(?P<noverifyhost>.*)",
+            },
+            "requireMatch": true,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{login}"
+        }
+    ]
+}
