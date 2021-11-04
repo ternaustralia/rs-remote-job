@@ -2,9 +2,17 @@ import json
 import paramiko
 import tempfile
 
+from jsonschema import validate
 from typing import Dict
 from resource_server.utils.signing_api import get_keys
-from resource_server.settings import MASTER_NODE_HOST, MASTER_NODE_PORT, MASTER_NODE_USER, COMMANDS_JSON_FILE
+from resource_server.settings import (
+    MASTER_NODE_HOST,
+    MASTER_NODE_PORT,
+    MASTER_NODE_USER,
+    COMMANDS_JSON_FILE,
+    COMMANDS_JSON_SCHEMA
+)
+
 
 
 def paramiko_establish_connection():
@@ -34,7 +42,7 @@ def paramiko_establish_connection():
         ssh_key.load_certificate(f"{keys_path}-cert.pub")
 
     # TODO: note, that we should use host key verification in some way.
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(
             hostname=MASTER_NODE_HOST,
             username=MASTER_NODE_USER,
@@ -46,14 +54,19 @@ def paramiko_establish_connection():
 
 def read_json_file() -> Dict[str, str]:
     """ Read JSON file that stores the full list of commands to be execute
-
         Return
         -------------
         json_data: Dict[str,str]
     """
 
-    json_data = dict()
-    with open(COMMANDS_JSON_FILE) as json_file:
-        json_data = json.load(json_file)
+    schema = dict()
+    with open(COMMANDS_JSON_SCHEMA) as json_file:
+        schema = json.load(json_file)
 
-    return json_data
+    instance = dict()
+    with open(COMMANDS_JSON_FILE) as json_file:
+        instance = json.load(json_file)
+
+    validate(instance=instance, schema=schema)
+
+    return instance

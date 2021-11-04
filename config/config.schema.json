@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ternaustralia/rs-remote-job/config.schema.json",
+  "title": "Endpoints",
+  "description": "Config json for resource server to define endpoints",
+  "type": "object",
+  "properties": {
+    "parameters": {
+      "description": "List of parameters supplied to this resource server",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "default": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "default"
+        ]
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "endpoints": {
+      "description": "List of endpoints to be defined",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "name of this endpoint"
+          },
+          "async": {
+            "type": "boolean"
+          },
+          "httpMethod": {
+            "type": "string",
+            "enum": [
+              "GET",
+              "POST",
+              "DELETE"
+            ]
+          },
+          "exec": {
+            "type": "object",
+            "description": "The command to be executed in login host. Note that the paramters defined in {} needs to be substitued with paramers supplied to this command, and server",
+            "properties": {
+              "parameters": {
+                "type": "array",
+                "description": "List of parameters supplied to this command/endpoint",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "default": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": true
+              },
+              "command": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "parameters",
+              "command"
+            ]
+          },
+          "output": {
+            "type": "object",
+            "description": "The output format, if defined in string then ignore the exec part",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "value"
+            ]
+          },
+          "requireMatch": {
+            "type": "boolean"
+          },
+          "failFatal": {
+            "type": "boolean"
+          },
+          "formatFatal": {
+            "type": "boolean"
+          },
+          "host": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "async",
+          "httpMethod",
+          "output",
+          "requireMatch",
+          "failFatal",
+          "formatFatal",
+          "host"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "endpoints"
+  ]
+}

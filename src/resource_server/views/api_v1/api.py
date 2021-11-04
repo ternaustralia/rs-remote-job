@@ -12,5 +12,13 @@ from resource_server.utils.common import paramiko_establish_connection
 @openapi.validate()
 def cmd(endpoint):
     ssh = paramiko_establish_connection()
-    response = execute_command(ssh, endpoint)
+    response = execute_command(ssh, endpoint, "GET")
+    return jsonify(response)
+
+@bp.route("/cmd/<endpoint>", methods=["POST"])
+@require_user
+@openapi.validate()
+def cmd(endpoint):
+    ssh = paramiko_establish_connection()
+    response = execute_command(ssh, endpoint, "POST")
     return jsonify(response)

@@ -12,5 +12,6 @@ MASTER_NODE_HOST = os.environ["MASTER_NODE_HOST_ENV"]
 MASTER_NODE_USER = os.environ["MASTER_NODE_USER_ENV"]
 MASTER_NODE_PORT = os.environ["MASTER_NODE_PORT_ENV"]
 
-COMMANDS_JSON_FILE = os.environ["CMD_JSON_FILE_ABS_PATH_ENV"]
+COMMANDS_JSON_FILE = f"{os.path.abspath('./')}/config/config.json"
+COMMANDS_JSON_SCHEMA = f"{os.path.abspath('./')}/config/config.schema.json"
 
