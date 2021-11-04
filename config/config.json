@@ -415,7 +415,7 @@
             },
             "output": {
                 "type":"regex/string",
-                "value": ""
+                "value": "(vim)"
             },
             "async": false,
             "failFatal": true,

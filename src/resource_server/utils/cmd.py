@@ -18,7 +18,7 @@ def execute_command(ssh: SSHClient, endpoint: str, method: str) -> Dict[str, any
 
     cmd = command["exec"]["command"]
 
-    stdin, stdout, stderr = ssh.exec_command(cmd.get('cmd'))
+    stdin, stdout, stderr = ssh.exec_command(cmd)
     lines = stdout.readlines()
 
     # Return any error
