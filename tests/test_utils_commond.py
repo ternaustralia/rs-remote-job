@@ -10,7 +10,7 @@ class TestUtilsCommond(unittest.TestCase):
         json_data = read_json_file()
 
         self.assertIsInstance(json_data, dict)
-        self.assertIsNotNone(json_data.get('Commands'))
+        self.assertIsNotNone(json_data.get('endpoints'))
 
     def test_paramiko_stablish_connection(self):
         """ Check if paramiko can connect with the host """

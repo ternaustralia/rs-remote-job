@@ -1,0 +1,428 @@
+{
+    "parameters": [
+        {"name": "login", "type": "string", "default": "login"},
+        {"name": "exec", "type": "string", "default": "exec"},
+        {"name": "local", "type": "string", "default": "local"},
+        {"name": "squeue", "type": "string", "default": "/usr/bin/squeue"},
+        {"name": "sacctmgr", "type": "string", "default": "/usr/bin/sacctmgr"},
+        {"name": "clearpass", "type": "string", "default": "~/.vnc/clearpass"},
+        {"name": "scontrol", "type": "string", "default": "/usr/bin/scontrol"},
+        {"name": "scancel", "type": "string", "default": "/usr/bin/scancel"},
+        {"name": "coesra-containers", "type": "string", "default": "/nfs/home/public_share_data/installers/coesra-containers"}
+    ],
+    "endpoints": [
+        {
+            "name": "exists",
+            "httpMethod": "GET",
+            "async": false,
+            "exec": {
+                "parameters":[],
+                "command": "if [ -d $HOME ] && {{ sacctmgr }} list user format=User%-50 | grep --quiet `whoami`; then echo true; else echo false; fi"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^(true|false)$"
+            },
+            "requireMatch": true,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}"
+        },
+        {
+            "name": "agent",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "{sshBinary} -A -c {cipher} -t -t -oStrictHostKeyChecking=no -l {username} {execHost} \"echo agent_hello; bash \""
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "agent_hello"
+            },
+            "async": true,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "loop": false,
+            "requireMatch": true
+        },
+        {
+            "name": "exec_host",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "\"{{ squeue }} -j {jobidNumber} -o \"%N\" | tail -n -1 | cut -f 1 -d ',' | xargs -iname getent hosts name | cut -f 1 -d ' ' \""
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^(?P<execHost>.*)$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "loop": false,
+            "requireMatch": true
+        },
+        {
+            "name": "projects",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "\"groups | sed 's@ @\\n@g'\""
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^\\s*(?P<group>\\S+)\\s*$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "loop": false,
+            "requireMatch": true
+        },
+        {
+            "name": "list_all",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "{{ squeue }} -u `whoami` -o \\\"%i %L\\\" | tail -n -1"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "(?P<jobid>(?P<jobidNumber>[0-9]+)) (?P<remainingWalltime>.*)$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "loop": false,
+            "requireMatch": false
+        },
+        {
+            "name": "otp",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "'cat {{ clearpass }}'"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^(?P<vncPasswd>\\S+)$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "loop": false,
+            "requireMatch": true
+        },
+        {
+            "name": "running",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "\"{{ scontrol }} show job {jobidNumber}\""
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "JobState=RUNNING"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "requireMatch": true
+        },
+        {
+            "name": "start_server",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [
+                    {"name": "vnc", "type": "string", "default": "~/.vnc"},
+                    {"name": "containerpath", "type": "string", "default": "~/.vnc/containerpath"}
+                ],
+                "command": "mkdir -p {{ vnc }} ; rm -f {{ clearpass }} ; touch {{ clearpass }} ; chmod 600 {{ clearpass }} ; passwd=$( dd if=/dev/urandom bs=1 count=8 2>/dev/null | md5sum | cut -b 1-8 ) ; echo $passwd > {{ clearpass }} ; cat {{ clearpass }} | vncpasswd -f > ~/.vnc/passwd ; chmod 600 ~/.vnc/passwd ; echo -e '#!/bin/bash\n /opt/singularity/bin/singularity exec -B /nfs/home/EcoStore:/home/EcoStore,/nfs/home/OzFlux:/home/OzFlux,/nfs/home/public_share_data:/home/public_share_data,/nfs/home/public_share_workflow:/home/public_share_workflow {{ coesra-containers }}/{container} vncserver; sleep 36000000 ' | {{ sbatch }} -p batch -s -n 1 -c {ppn} --mem={mem}gb --time={hours}:00:00 -J desktop_'test' -o .vnc/slurm-%j.out; echo {{ coesra-containers }}/{container} > {{ containerpath }}"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^Submitted batch job (?P<jobid>(?P<jobidNumber>[0-9]+))$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "requireMatch": true
+        },
+        {
+            "name": "current_container",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [
+                    {"name": "containerpath", "type": "string", "default": "~/.vnc/containerpath"}
+                ],
+                "command": "cat {{ containerpath }}"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^(?P<containerPath>.*)$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "requireMatch": true
+        },
+        {
+            "name": "containers",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "\"ls -1r {{ coesra-containers }} | sed 's@ @\\n@g' | sort -r \""
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^\\s*(?P<container>\\S+)\\s*$"
+            },
+            "async": true,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "requireMatch": true
+        },
+        {
+            "name": "cpu_info",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "{{ scontrol }} -o show nodes | awk '{print $1, $4,$6}' |grep 'centos' "
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^NodeName=(?P<nodename>.+) CPUAlloc=(?P<alloc>[0-9]*) CPUTot=(?P<total>[0-9]*)$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "requireMatch": true
+        },
+        {
+            "name": "mem_info",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "{{ scontrol }} -o show nodes | awk '{print $1, $15,$14}' |grep 'centos' "
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^NodeName=(?P<nodename>.+) AllocMem=(?P<alloc>[0-9]*) RealMemory=(?P<total>[0-9]*)$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "requireMatch": true
+        },
+        {
+            "name": "",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "{{ scontrol }} -o show nodes | awk '{print $1, $18,$22}' |grep 'centos' "
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^NodeName=(?P<nodename>.+) State=(?P<state>.+) BootTime=(?P<boot>.+)$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "loop": false,
+            "requireMatch": true
+        },
+        {
+            "name": "",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [ ],
+                "command": "df -h /nfs |awk '{print $2, $3, $4, $5}' |sed -n 2p "
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^(?P<total>.+) (?P<alloc>.+) (?P<avail>.+) (?P<percent>.+)$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "requireMatch": true
+        },
+        {
+            "name": "usage",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [
+                    {"name": "sacct", "type": "string", "default": "/usr/bin/sacct"}
+                ],
+                "command": "{{ sacct }} -n -j all -u `whoami` --format=jobid,alloccpus,cputime,reqmem,start,end,elapsed |tr -s ' ' |grep -vwE '(Unknown|batch)'|tail -5 | sort -r -k1 -n"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^(?P<jobid>[0-9]*) (?P<alloccpus>.+) (?P<cputime>.+) (?P<reqmem>.+) (?P<start>.+) (?P<end>.+) (?P<elapsed>.+)$"
+            },
+            "async": true,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "requireMatch": true
+        },
+        {
+            "name": "run_kepler_desktop",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "\"/opt/kepler/kepler-2.4/kepler.sh {params} {workflow} &\""
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "agent_hello"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "requireMatch": true
+        },
+        {
+            "name": "run_kepler_headless",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [
+                    {"name": "sbatch", "type": "string", "default": "/usr/bin/sbatch"}
+                ],
+                "command": "echo -e '#!/bin/bash \n/opt/kepler/kepler-2.4/kepler.sh -runwf -nogui {params} {workflow}' | {{ sbatch }} -p batch -N '1' -n '1' --time='48':00:00 -J desktop_'hoangnguyen' -o .vnc/slurm-%j.out"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^Submitted batch job (?P<jobid>(?P<jobidNumber>[0-9]+))$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "requireMatch": true
+        },
+        {
+            "name": "",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "\"{{ scancel }} {jobidNumber}\""
+            },
+            "output": {
+                "type":"regex/string",
+                "value": ""
+            },
+            "async": false,
+            "cmd": "",
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "requireMatch": false
+        },
+        {
+            "name": "stop_for_restart",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "\"{{ scancel }} {jobidNumber}\""
+            },
+            "output": {
+                "type":"regex/string",
+                "value": ""
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "loop": false,
+            "requireMatch": false
+        },
+        {
+            "name": "start_tunnel",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "{sshBinary} -A -c {cipher} -t -t -oStrictHostKeyChecking=no -L {localPortNumber}:localhost:{remotePortNumber} -l {username} {execHost} \"echo tunnel_hello; bash\""
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "tunnel_hello"
+            },
+            "async": true,
+            "cmd": "",
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ local }}",
+            "requireMatch": true
+        },
+        {
+            "name": "",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "\"cat .vnc/slurm-{jobidNumber}.out\""
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^.*?New .* desktop is \\S+(?P<vncDisplay>:[0-9]+)\\s*$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ exec }}",
+            "requireMatch": true
+        },
+        {
+            "name": "ssh_private_key",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [],
+                "command": "[ ! -f ~/.ssh/authorized_keys ] && touch ~/.ssh/authorized_keys;[ ! -f ~/.ssh/coesra ] && ssh-keygen -q -t rsa -f ~/.ssh/coesra -N '' && cat ~/.ssh/coesra.pub >> ~/.ssh/authorized_keys; tr '\n' ':' < ~/.ssh/coesra"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "^(?P<privateKey>.*)$"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ login }}",
+            "requireMatch": true
+        },
+        {
+            "name": "test_command",
+            "httpMethod": "GET",
+            "exec": {
+                "parameters": [
+                    {"name": "file", "type": "string", "default": "vim"},
+                    {"name": "local", "type": "string", "default": "localhost"}
+                ],
+                "command": "ls -la ~/ | grep {{file}}"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "(vim)"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ local }}",
+            "requireMatch": true
+        }
+    ]
+}
+
