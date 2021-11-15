@@ -1,6 +1,5 @@
 import re
 import json
-from types import coroutine
 from typing import Dict
 from paramiko import SSHClient
 from jinja2 import Template
@@ -8,10 +7,8 @@ from jinja2 import Template
 from resource_server.utils.common import read_json_file
 
 
-def execute_command(ssh: SSHClient, endpoint: str, method: str) -> Dict[str, any]: 
+def execute_command(ssh: SSHClient, command: Dict[str, any], method: str) -> Dict[str, any]:
     """ Run the specific command and then check for the result """
-
-    command = load_template_values(endpoint)
 
     if method != command["httpMethod"]:
         raise Exception("The http-method does not match with the schema, please check your request")
@@ -32,17 +29,17 @@ def execute_command(ssh: SSHClient, endpoint: str, method: str) -> Dict[str, any
     if not command["output"].get("value"):
         return {
             "code": 200,
-            "message": tuple(lines), 
+            "message": tuple(lines),
         }
 
     # Return lines if and match regex output
     result = re.search(command["output"]["value"], " ".join(lines), re.IGNORECASE)
     return {
         "code": 200,
-        "message": result.groups() if result else (), 
+        "message": result.groups() if result else (),
     }
 
-def load_template_values(target: str) -> Dict[str, any]:
+def load_template_values(cmd_config: str, target: str) -> Dict[str, any]:
     """ Instance the command to be a candidate to run.
         Parameters
         -------------
@@ -52,9 +49,9 @@ def load_template_values(target: str) -> Dict[str, any]:
         -------------
         command: Dict[str,any]
     """
-    jsonfile = read_json_file()
+    jsonfile = read_json_file(cmd_config)
     endpoints = jsonfile['endpoints']
-    parameters = load_template_parameters(jsonfile["parameters"]) 
+    parameters = load_template_parameters(jsonfile["parameters"])
     command = dict()
 
     for endpoint in endpoints:
@@ -67,7 +64,7 @@ def load_template_values(target: str) -> Dict[str, any]:
         # Load global parameters
         template = json.dumps(endpoint)
         # merge both parameter where local_param will replace global params
-        command = json.loads(Template(template).render(parameters | local_param))    
+        command = json.loads(Template(template).render({** parameters, **local_param}))
 
     return command
 
@@ -92,6 +89,6 @@ def load_template_parameters(params: list) -> Dict[str, any]:
         elif param["type"] == "bool":
             default = bool(default)
 
-        parameters[param["name"]] = default 
+        parameters[param["name"]] = default
 
     return parameters

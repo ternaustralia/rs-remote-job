@@ -2,7 +2,6 @@ from typing import Dict
 import requests
 import json
 
-from resource_server.settings import BASE_URL
 
 def get_keys():
     """ Call signing key api and generate a new public, private and cert keys """
@@ -18,8 +17,8 @@ def check_signature(public_key: str, cert_key: str):
     # Prepare url
     url = f"{BASE_URL}/token/signing"
     # Prepare query
-    params = { 
-        "cert_key": cert_key, 
+    params = {
+        "cert_key": cert_key,
         "public_key": public_key
     }
 
