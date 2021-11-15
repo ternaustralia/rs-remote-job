@@ -10,6 +10,9 @@ requires = [
     "Flask",
     "Flask-Cors",
     "flask_tern",
+    "paramiko",
+    # We want importlib.resources.files() API
+    "importlib_resources; python_version < '3.9'",
 ]
 
 tests_require = [line.strip() for line in open(os.path.join(here, "requirements-test.txt")) if not line.startswith("#")]
