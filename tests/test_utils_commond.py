@@ -1,11 +1,11 @@
 import paramiko
 
-from resource_server.utils.common import paramiko_establish_connection, read_json_file
+from resource_server.utils.common import paramiko_establish_connection, validate_schema
 
 
-def test_read_json_file(cmds_config):
+def test_validate_schema(cmds_path_config):
     """ Test function that reads a json file """
-    json_data = read_json_file(cmds_config)
+    json_data = validate_schema(cmds_path_config)
 
     assert isinstance(json_data, dict)
     assert json_data.get('endpoints') is not None

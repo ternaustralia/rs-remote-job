@@ -4,8 +4,6 @@ from typing import Dict
 from paramiko import SSHClient
 from jinja2 import Template
 
-from resource_server.utils.common import read_json_file
-
 
 def execute_command(ssh: SSHClient, command: Dict[str, any], method: str) -> Dict[str, any]:
     """ Run the specific command and then check for the result """
@@ -39,7 +37,8 @@ def execute_command(ssh: SSHClient, command: Dict[str, any], method: str) -> Dic
         "message": result.groups() if result else (),
     }
 
-def load_template_values(cmd_config: str, target: str) -> Dict[str, any]:
+
+def load_template_values(cmd_config: Dict[str, any], target: str) -> Dict[str, any]:
     """ Instance the command to be a candidate to run.
         Parameters
         -------------
@@ -49,9 +48,8 @@ def load_template_values(cmd_config: str, target: str) -> Dict[str, any]:
         -------------
         command: Dict[str,any]
     """
-    jsonfile = read_json_file(cmd_config)
-    endpoints = jsonfile['endpoints']
-    parameters = load_template_parameters(jsonfile["parameters"])
+    endpoints = cmd_config['endpoints']
+    parameters = load_template_parameters(cmd_config["parameters"])
     command = dict()
 
     for endpoint in endpoints:

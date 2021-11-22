@@ -72,24 +72,6 @@ Run flask development server.
 The app can then be accessed at http://localhost:5000
 
 
-Database management
+Test with with external service
 ===================
 
-The project uses Flask-Migrate to manage databes schemas.
-Flask-Migrate uses Alembic to manage database migrations. As a first step it is
-necessary to initialise the Alembic configuration with `flask db init`. This will create a
-module `resource_server.migrations` with the necessarry settings and boilerplate for Alembic.
-Whenever there are changes to the database models, it is necessary to create a new migration step and apply this migration to the database.
-Per default the development environment uses sqlite as database backend, but this can easily be change by reconfiguring Flask-SQLAlchemy.
-
-.. code:: bash
-
-    # init migrations
-    flask db init
-
-    # the following two steps are necessary when changing database models
-    # create new mgration / revision
-    flask db migrate
-
-    # update / create db. this step also initialises an empty database with the latest db schema.
-    flask db upgrade

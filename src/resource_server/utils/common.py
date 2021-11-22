@@ -1,18 +1,18 @@
+import io
+import json
+import paramiko
 import importlib
+
+from typing import Dict
+from jsonschema import validate
+from resource_server.utils.signing_api import get_keys
+
 try:
     from importlib.resources import files as pkg_files
 except ImportError:
     from importlib_resources import files as pkg_files
-import io
-import json
-import paramiko
-
-from jsonschema import validate
-from typing import Dict
-from resource_server.utils.signing_api import get_keys
 
 
-# TODO: host and port should come from cmds_config?
 def paramiko_establish_connection(user, host, port=22):
     """ User paramiko to stablish a connection to the master node
         Parameters
@@ -41,21 +41,21 @@ def paramiko_establish_connection(user, host, port=22):
 
     return ssh
 
-def read_json_file(cmd_config) -> Dict[str, str]:
-    """ Read JSON file that stores the full list of commands to be execute
+def validate_schema(path_file: str) -> Dict[str, any]:
+    """ Load the json cmd_config and the schema validator, check if it works
+
+        Parameters
+        -------------
+        path_file: str
+            The path where the cmd_confg is located
         Return
         -------------
-        json_data: Dict[str,str]
+        instance: dict
+
     """
 
-    schema = dict()
-    with (pkg_files(importlib.util.find_spec(__name__).parent) / "config.schema.json").open("r") as json_file:
-        schema = json.load(json_file)
-
-    instance = dict()
-    with open(cmd_config) as json_file:
-        instance = json.load(json_file)
-
-    validate(instance=instance, schema=schema)
+    schema = json.load((pkg_files(importlib.util.find_spec(__name__).parent) / "config.schema.json").open("r"))
+    instance = json.load(open(path_file))
+    validate(instance=instance,schema=schema)
 
     return instance

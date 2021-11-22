@@ -3,13 +3,12 @@ FLASK_ENV=development
 
 RESOURCE_SERVER_SETTINGS=development.cfg
 
+KEY_SIGNING_BASE_URL_ENV=http://127.0.0.1:5000/
+ # SLURM master node
+MASTER_NODE_HOST_ENV=172.18.0.3
+MASTER_NODE_USER_ENV=ec2-user
+MASTER_NODE_PORT_ENV=22
 
-KEY_SIGNING_BASE_URL_ENV=
-# SLURM master node
-MASTER_NODE_HOST_ENV=
-MASTER_NODE_USER_ENV=
-MASTER_NODE_PORT_ENV=
-CMD_JSON_FILE_ABS_PATH_ENV=
 
 # TODO: move this into development.cfg?
 #       it's secrets ... would be much better to fake it away somehow

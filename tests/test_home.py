@@ -1,4 +1,4 @@
-import base64
+from dataclasses import asdict
 
 
 def test_root(client):
@@ -20,10 +20,10 @@ def test_whoami_fail(client):
     assert response.status_code == 403
 
 
-def test_whoami_ok(client):
+def test_whoami_ok(client, basic_auth):
     response = client.get(
         "/api/whoami",
-        headers={"Authorization": "Basic {}".format(base64.b64encode(b"user:user").decode("ascii"))},
+        headers={"Authorization": basic_auth["usere"].auth},
     )
     assert response.status_code == 200
-    assert response.json == {"email": "user@example.com", "id": "user", "name": "user", "roles": ["user"]}
+    assert response.json == asdict(basic_auth["usere"])
