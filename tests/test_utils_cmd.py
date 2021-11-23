@@ -2,11 +2,11 @@ from resource_server.utils.common import paramiko_establish_connection, validate
 from resource_server.utils.cmd import execute_command, load_template_values, load_template_parameters
 
 
-def test_execute_command(monkeypatch, ssh_server, mock_post_request, cmds_path_config, test_command, base_url):
+def test_execute_command(ssh_server, mock_post_request, cmds_path_config, test_command, base_url):
     """ Check if is possible to run commands in the remote host """
 
     command = load_template_values(validate_schema(cmds_path_config), test_command)
-    monkeypatch.setitem(command, "port", ssh_server.port)
+    command["port"] = ssh_server.port
 
     ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"])
     response = execute_command(ssh, command, "GET")
@@ -16,11 +16,11 @@ def test_execute_command(monkeypatch, ssh_server, mock_post_request, cmds_path_c
     assert ssh_server.commands[0] == command['exec']['command']
 
 
-def test_execute_command_post(monkeypatch, ssh_server, mock_post_request, cmds_path_config, base_url):
+def test_execute_command_post(ssh_server, mock_post_request, cmds_path_config, base_url):
     """ Check if is possible to run commands in the remote host """
 
     command = load_template_values(validate_schema(cmds_path_config), "test_post_command")
-    monkeypatch.setitem(command, "port", ssh_server.port)
+    command["port"] = ssh_server.port
 
     ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"])
     response = execute_command(ssh, command, "POST")

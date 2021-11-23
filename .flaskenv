@@ -1,4 +1,4 @@
-FLASK_APP=ssh_cert_service
+FLASK_APP=resource_server
 FLASK_ENV=development
 
 SSH_CERT_SERVICE_SETTINGS=development.cfg

@@ -22,11 +22,11 @@ def test_validate_globals_schema(cmds_path_config):
     assert command["exec"]["command"] == "different_host_name /usr/bin/scancel /usr/bin/squeue"
 
 
-def test_paramiko_stablish_connection(monkeypatch, ssh_server, mock_post_request, base_url, cmds_path_config, test_command):
+def test_paramiko_stablish_connection(ssh_server, mock_post_request, base_url, cmds_path_config, test_command):
     """ Check if paramiko can connect with the host """
 
     command = load_template_values(validate_schema(cmds_path_config), test_command)
-    monkeypatch.setitem(command, "port", ssh_server.port)
+    command["port"] = ssh_server.port
 
     ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"])
     assert isinstance(ssh, paramiko.SSHClient)

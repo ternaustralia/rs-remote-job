@@ -54,8 +54,12 @@ def validate_schema(path_file: str) -> Dict[str, any]:
 
     """
 
-    schema = json.load((pkg_files(importlib.util.find_spec(__name__).parent) / "config.schema.json").open("r"))
-    instance = json.load(open(path_file))
+    with (pkg_files(importlib.util.find_spec(__name__).parent) / "config.schema.json").open("r") as paht_schema:
+        schema = json.load(paht_schema)
+
+    with open(path_file) as path_instance:
+        instance = json.load(path_instance)
+
     validate(instance=instance,schema=schema)
 
     return instance
