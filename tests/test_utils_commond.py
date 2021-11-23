@@ -35,7 +35,6 @@ def test_paramiko_stablish_connection(monkeypatch, ssh_server, mock_post_request
 def test_paramiko_fail_connection(mock_post_request, base_url, cmds_path_config):
     """ Check that paramiko is unable to connect with the default port """
 
-    # command = load_template_values(validate_schema(cmds_path_config), test_command)
     command = load_template_values(validate_schema(cmds_path_config), "test_post_command")
 
     try:
