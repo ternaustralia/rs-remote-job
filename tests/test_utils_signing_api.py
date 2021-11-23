@@ -1,9 +1,10 @@
 from resource_server.utils.signing_api import get_keys, check_signature
 
 # TODO: should verify that get_keys issues correct _post_request
-def test_get_keys(mock_ssh_cert_service):
+def test_get_keys(mock_post_request, base_url):
     """ Get new ssh keys and CA """
-    keys = mock_ssh_cert_service.get_keys()
+
+    keys = get_keys(base_url)
 
     assert isinstance(keys, dict)
     assert "cert_key" in keys.keys()
@@ -12,10 +13,9 @@ def test_get_keys(mock_ssh_cert_service):
 
 
 # TODO: should verify that check_signature issues correct _post_request
-def test_check_signature():
+def test_check_signature(mock_post_request, get_keys, base_url):
     """ Verify the signature with the public and certificate """
 
-    keys = get_keys()
-    is_signed = check_signature(keys["public_key"], keys["cert_key"])
+    response = check_signature(base_url, get_keys["public_key"], get_keys["cert_key"])
 
-    assert True == is_signed
+    assert response["code"] == 200

@@ -446,6 +446,47 @@
             "host": "{{ local }}",
             "port": "{{ port }}",
             "requireMatch": true
+        },
+        {
+            "name": "test_post_command",
+            "httpMethod": "POST",
+            "exec": {
+                "parameters": [
+                    {"name": "file", "type": "string", "default": "vim"}
+                ],
+                "command": "ls -la ~/ | grep {{file}}"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "(vim)"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ local }}",
+            "port": "{{ port }}",
+            "requireMatch": true
+        },
+        {
+            "name": "test_globals",
+            "httpMethod": "POST",
+            "exec": {
+                "parameters": [
+                    {"name": "login", "type": "string", "default": "different_host_name"},
+                    {"name": "port", "type": "int", "default": "5522"}
+                ],
+                "command": "{{login}} {{scancel}} {{squeue}}"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "(vim)"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ local }}",
+            "port": "{{ port }}",
+            "requireMatch": true
         }
     ]
 }

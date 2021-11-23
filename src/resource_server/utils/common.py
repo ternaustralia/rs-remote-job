@@ -13,7 +13,7 @@ except ImportError:
     from importlib_resources import files as pkg_files
 
 
-def paramiko_establish_connection(user, host, port=22):
+def paramiko_establish_connection(base_url: str, user: str, host: str, port: int) -> paramiko.SSHClient:
     """ User paramiko to stablish a connection to the master node
         Parameters
         -------------
@@ -22,7 +22,7 @@ def paramiko_establish_connection(user, host, port=22):
         ssh
     """
     ssh = paramiko.SSHClient()
-    keys = get_keys()
+    keys = get_keys(base_url)
 
     # Create temporary dicrectory and storage the keys there
     ssh_key = paramiko.RSAKey.from_private_key(io.StringIO(keys['private_key']))

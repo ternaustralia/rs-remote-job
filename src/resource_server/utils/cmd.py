@@ -1,8 +1,9 @@
 import re
 import json
+
 from typing import Dict
-from paramiko import SSHClient
 from jinja2 import Template
+from paramiko import SSHClient
 
 
 def execute_command(ssh: SSHClient, command: Dict[str, any], method: str) -> Dict[str, any]:
@@ -49,6 +50,7 @@ def load_template_values(cmd_config: Dict[str, any], target: str) -> Dict[str, a
         command: Dict[str,any]
     """
     endpoints = cmd_config['endpoints']
+    # Load global parameters
     parameters = load_template_parameters(cmd_config["parameters"])
     command = dict()
 
@@ -59,7 +61,7 @@ def load_template_values(cmd_config: Dict[str, any], target: str) -> Dict[str, a
         # Load local parameters
         local_param = load_template_parameters(endpoint["exec"]["parameters"])
 
-        # Load global parameters
+        # Convert the Dict into a json template
         template = json.dumps(endpoint)
         # merge both parameter where local_param will replace global params
         command = json.loads(Template(template).render({** parameters, **local_param}))

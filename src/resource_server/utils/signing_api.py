@@ -1,21 +1,21 @@
-from typing import Dict
-import requests
 import json
+import requests
+from typing import Dict
 
 
-def get_keys():
+def get_keys(base_url) -> Dict[str, str]:
     """ Call signing key api and generate a new public, private and cert keys """
     # Prepare url
-    url = f"{BASE_URL}/token"
+    url = f"{base_url}/key/generate"
     # Prepare query
     params = {}
 
     return _post_request(url, params)
 
-def check_signature(public_key: str, cert_key: str):
+def check_signature(base_url, public_key: str, cert_key: str) -> Dict[str, str]:
     """ Check if the certificate key is valid """
     # Prepare url
-    url = f"{BASE_URL}/token/signing"
+    url = f"{base_url}/key/verify"
     # Prepare query
     params = {
         "cert_key": cert_key,
