@@ -29,6 +29,28 @@
         "minItems": 0,
         "uniqueItems": true
       },
+      "statics": {
+        "description": "List of endpoints returning constant values - GET only",
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "oneOf": [
+                        {"type": "string"},
+                        {"type": "number"}
+                    ]
+                },
+                "default": {
+                    "type": "string"
+                }
+            },
+            "required": [ "name", "type"]
+        }
+      },
       "endpoints": {
           "description": "List of endpoints to be defined",
           "type": "array",
@@ -81,7 +103,13 @@
                             "uniqueItems": true
                         },
                         "command": {
-                            "type": "string"
+                            "description": "command to execute",
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "description": "jinja2 format parameter"
+                            }
+
                         }
                     },
                     "required": [ "parameters", "command"]

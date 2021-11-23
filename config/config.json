@@ -3,6 +3,9 @@
         {"name": "login", "type": "string", "default": ""},
         {"name": "var2","type": "int", "default": 1}    
     ],
+    "statics": [
+        {"name": "flavour", "type": "string", "default": "m2.medium"}
+    ],
     "endpoints": [
         {
             "name": "example1",
@@ -13,10 +16,10 @@
                     {"name": "param1", "type": "int", "default": 1},
                     {"name": "param2", "type": "string", "default": ""}
                 ],
-                "command": "/path/to/binary {param1} {param2} {var2}"
+                "command": ["/path/to/binary", "{{ param1 }}", "{{ param2 }}", "{{ var2 }}"]
             },
             "output": {
-                "type": "regex/string",
+                "type": "regex",
                 "value": "(?P<name>[a-zA-Z0-9_]+),(?P<type>[a-zA-Z0-9_]+),(?P<jsonconfig>.*),(?P<amqpuri>.*),(?P<amqpcert>.*),(?P<amqpnoverifypeer>.*),(?P<amqpnoverifyhost>.*),(?P<uri>.*),(?P<cert>.*),(?P<noverifypeer>.*),(?P<noverifyhost>.*)",
             },
             "requireMatch": true,
