@@ -1,8 +1,9 @@
 {
     "parameters": [
-        {"name": "login", "type": "string", "default": "login"},
+        {"name": "login", "type": "string", "default": "127.0.0.1"},
+        {"name": "port", "type": "int", "default": "22"},
         {"name": "exec", "type": "string", "default": "exec"},
-        {"name": "local", "type": "string", "default": "local"},
+        {"name": "local", "type": "string", "default": "127.0.0.1"},
         {"name": "squeue", "type": "string", "default": "/usr/bin/squeue"},
         {"name": "sacctmgr", "type": "string", "default": "/usr/bin/sacctmgr"},
         {"name": "clearpass", "type": "string", "default": "~/.vnc/clearpass"},
@@ -26,7 +27,8 @@
             "requireMatch": true,
             "failFatal": true,
             "formatFatal": false,
-            "host": "{{ login }}"
+            "host": "{{ login }}",
+            "port": "{{ port }}"
         },
         {
             "name": "agent",
@@ -43,6 +45,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "loop": false,
             "requireMatch": true
         },
@@ -61,6 +64,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "loop": false,
             "requireMatch": true
         },
@@ -79,6 +83,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "loop": false,
             "requireMatch": true
         },
@@ -97,6 +102,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "loop": false,
             "requireMatch": false
         },
@@ -115,6 +121,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "loop": false,
             "requireMatch": true
         },
@@ -133,6 +140,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -153,6 +161,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -172,6 +181,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -189,6 +199,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -206,6 +217,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -223,6 +235,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -240,6 +253,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "loop": false,
             "requireMatch": true
         },
@@ -258,6 +272,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -277,6 +292,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -294,6 +310,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -313,6 +330,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -331,6 +349,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "requireMatch": false
         },
         {
@@ -348,6 +367,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "loop": false,
             "requireMatch": false
         },
@@ -367,6 +387,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ local }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -384,6 +405,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ exec }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -401,6 +423,7 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ login }}",
+            "port": "{{ port }}",
             "requireMatch": true
         },
         {
@@ -421,6 +444,48 @@
             "failFatal": true,
             "formatFatal": false,
             "host": "{{ local }}",
+            "port": "{{ port }}",
+            "requireMatch": true
+        },
+        {
+            "name": "test_post_command",
+            "httpMethod": "POST",
+            "exec": {
+                "parameters": [
+                    {"name": "file", "type": "string", "default": "vim"}
+                ],
+                "command": "ls -la ~/ | grep {{file}}"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "(vim)"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ local }}",
+            "port": "{{ port }}",
+            "requireMatch": true
+        },
+        {
+            "name": "test_globals",
+            "httpMethod": "POST",
+            "exec": {
+                "parameters": [
+                    {"name": "login", "type": "string", "default": "different_host_name"},
+                    {"name": "port", "type": "int", "default": "5522"}
+                ],
+                "command": "{{login}} {{scancel}} {{squeue}}"
+            },
+            "output": {
+                "type":"regex/string",
+                "value": "(vim)"
+            },
+            "async": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{ local }}",
+            "port": "{{ port }}",
             "requireMatch": true
         }
     ]

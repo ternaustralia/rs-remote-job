@@ -1,25 +1,39 @@
-from resource_server.utils.common import paramiko_establish_connection, read_json_file
+from resource_server.utils.common import paramiko_establish_connection, validate_schema
 from resource_server.utils.cmd import execute_command, load_template_values, load_template_parameters
 
 
-def test_execute_command(ssh_server, mock_ssh_cert_service, cmds_config):
+def test_execute_command(ssh_server, mock_post_request, cmds_path_config, test_command, base_url):
     """ Check if is possible to run commands in the remote host """
 
-    ssh = paramiko_establish_connection("user", "127.0.0.1", ssh_server.port)
-    cmd_config = read_json_file(cmds_config)
-    # TODO: need a better way to find "test_command"
-    response = execute_command(ssh, cmd_config["endpoints"][-1], "GET")
+    command = load_template_values(validate_schema(cmds_path_config), test_command)
+    command["port"] = ssh_server.port
+
+    ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"])
+    response = execute_command(ssh, command, "GET")
 
     assert isinstance(response, dict)
     assert response['code'] == 200
-    assert ssh_server.commands[0] == cmd_config["endpoints"][-1]['exec']['command']
+    assert ssh_server.commands[0] == command['exec']['command']
 
 
-def test_load_template_values(cmds_config):
+def test_execute_command_post(ssh_server, mock_post_request, cmds_path_config, base_url):
+    """ Check if is possible to run commands in the remote host """
+
+    command = load_template_values(validate_schema(cmds_path_config), "test_post_command")
+    command["port"] = ssh_server.port
+
+    ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"])
+    response = execute_command(ssh, command, "POST")
+
+    assert isinstance(response, dict)
+    assert response['code'] == 200
+    assert ssh_server.commands[0] == command['exec']['command']
+
+
+def test_load_template_values(cmds_path_config, test_command):
     """ Check if the shcema validator is correct and loading the parameters """
 
-    command = load_template_values(cmds_config, "test_command")
-
+    command = load_template_values(validate_schema(cmds_path_config), test_command)
     assert "ls -la ~/ | grep vim" == command["exec"]["command"]
 
 
