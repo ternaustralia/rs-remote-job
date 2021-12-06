@@ -4,5 +4,5 @@ API
 ===
 
 
-.. automodule:: resource-server
+.. automodule:: resource_server
     :members:

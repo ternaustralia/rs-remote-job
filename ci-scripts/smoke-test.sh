@@ -3,16 +3,16 @@
 # this script assumes that there is a postgres service setup in your bitbucket pipeline build step
 
 IMAGE_NAME=$1
-CONTAINER_NAME=resource-server
+CONTAINER_NAME=resource_server
 
 # start up image
 docker run -d -p 5000:5000 \
     --name $CONTAINER_NAME \
-    -e RESOURCE-SERVER_SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@postgres/postgres \
-    -e RESOURCE-SERVER_OIDC_DISCOVERY_URL=http://localhost:5000/ \
+    -e RESOURCE_SERVER_SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@postgres/postgres \
+    -e RESOURCE_SERVER_OIDC_DISCOVERY_URL=http://localhost:5000/ \
     --add-host postgres:$BITBUCKET_DOCKER_HOST_INTERNAL \
     $IMAGE_NAME \
-    gunicorn --bind :5000 --workers=1 --threads=2 'resource-server:create_app()'
+    gunicorn --bind :5000 --workers=1 --threads=2 'resource_server:create_app()'
 
 # connect to _health endpoint
 wget -O - --content-on-error -q --tries 5 --retry-connrefused http://localhost:5000/api/_health

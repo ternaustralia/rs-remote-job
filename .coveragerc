@@ -1,3 +1,3 @@
 [run]
-source = src/resource-server
+source = src/resource_server
 omit = tests/

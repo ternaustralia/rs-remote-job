@@ -17,3 +17,5 @@ prof/
 
 docs/_build/
 flask_session/
+
+Pipfile*

@@ -3,4 +3,4 @@
 Rest API
 ========
 
-.. openapi:: ../src/resource-server/views/api_v1/openapi.yaml
+.. openapi:: ../src/resource_server/views/api_v1/openapi.yaml

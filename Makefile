@@ -1,6 +1,6 @@
 
 IMAGE_REPO=ternau
-IMAGE_NAME=resource-server
+IMAGE_NAME=resource_server
 IMAGE_TAG=latest
 
 IMAGE=$(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)
@@ -28,7 +28,7 @@ test-cov:
 	  -u root \
 	  --entrypoint ./ci-scripts/run-tests.sh \
 	  $(IMAGE) \
-	  --cov=resource-server --cov-report=html
+	  --cov=resource_server --cov-report=html
 
 doc:
 	docker run --rm -it \
