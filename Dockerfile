@@ -1,4 +1,4 @@
-ARG ALPINE_VERSION=3.13
+ARG ALPINE_VERSION=3.15
 
 # BUILD and install code
 FROM alpine:${ALPINE_VERSION} as builder
@@ -8,7 +8,13 @@ RUN apk add --no-cache \
   git \
   python3 \
   python3-dev \
-  g++
+  g++ 
+
+# Working compiler that would install build-base package, this tools that are required to compile pynacl 
+RUN apk add --no-cache --virtual \ 
+  .pynacl_deps \
+  build-base \
+  libffi-dev
 
 # Pkgs hard / slow / annoying to build from sourc (also those of which version does not matter too much)
 RUN apk add --no-cache \
@@ -73,9 +79,6 @@ ENV FLASK_APP=resource_server \
   FLASK_ENV=production
 
 USER 1000
-
-# TODO: setup ENTRYPOINT if needed and default CMD
-ENTRYPOINT ["/docker_entrypoint.sh"]
 
 # CMD ["gunicorn", "--bind=:5000", "--workers=2", "--threads=4", "--forwarded-allow-ips='*'",  "--statsd-host=statsd-exporter.services:9125", "--statsd-prefix=ecoimages_portal_api", "resource_server:create_app()"]
 
