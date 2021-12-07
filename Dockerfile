@@ -8,13 +8,9 @@ RUN apk add --no-cache \
   git \
   python3 \
   python3-dev \
-  g++ 
-
-# Working compiler that would install build-base package, this tools that are required to compile pynacl 
-RUN apk add --no-cache --virtual \ 
-  .pynacl_deps \
   build-base \
-  libffi-dev
+  libffi-dev \ 
+  g++ 
 
 # Pkgs hard / slow / annoying to build from sourc (also those of which version does not matter too much)
 RUN apk add --no-cache \
@@ -46,10 +42,6 @@ RUN pip install -r /workspace/requirements.txt
 COPY dist/ /workspace/dist/
 # Install pkg
 RUN pip install --no-cache-dir /workspace/dist/*.whl
-
-
-
-
 
 # BUILD space optimised final image, based on installed code from builder
 FROM alpine:${ALPINE_VERSION} as runner
