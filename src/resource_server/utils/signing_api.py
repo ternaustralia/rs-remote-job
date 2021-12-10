@@ -12,7 +12,7 @@ def get_keys(base_url: str, headers: Dict) -> Dict[str, str]:
 
     return _post_request(url, params, headers)
 
-def check_signature(base_url, public_key: str, cert_key: str, header: Dict) -> Dict[str, str]:
+def check_signature(base_url, public_key: str, cert_key: str, headers: Dict) -> Dict[str, str]:
     """ Check if the certificate key is valid """
     # Prepare url
     url = f"{base_url}/key/verify"
