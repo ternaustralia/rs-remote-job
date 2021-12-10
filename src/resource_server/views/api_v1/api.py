@@ -29,8 +29,6 @@ def cmd(endpoint):
     print(request.headers)
     print("===============================")
 
-    raise Exception()
-
-    ssh = paramiko_establish_connection(base_url, user, command["host"], command["port"], request.headers.get("Authorization"))
+    ssh = paramiko_establish_connection(base_url, user, command["host"], command["port"], request.headers)
     response = execute_command(ssh, command, request.method)
     return jsonify(response)
