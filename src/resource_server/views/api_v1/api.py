@@ -25,10 +25,6 @@ def cmd(endpoint):
     if current_app.config["TESTING"]:
         command["port"] = request.json.get("ssh_port")
 
-    print("===============================")
-    print(request.headers)
-    print("===============================")
-
     ssh = paramiko_establish_connection(base_url, user, command["host"], command["port"], request.headers)
     response = execute_command(ssh, command, request.method)
     return jsonify(response)
