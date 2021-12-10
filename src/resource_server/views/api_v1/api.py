@@ -1,7 +1,6 @@
 from flask import current_app, jsonify, request
 from flask_tern import openapi
 from flask_tern.auth import current_user, require_user
-from flask import request
 
 
 from resource_server.views.api_v1.blueprint import bp
