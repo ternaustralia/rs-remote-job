@@ -3,16 +3,17 @@ import requests
 from typing import Dict
 
 
-def get_keys(base_url) -> Dict[str, str]:
+def get_keys(base_url: str, auth: str) -> Dict[str, str]:
     """ Call signing key api and generate a new public, private and cert keys """
     # Prepare url
     url = f"{base_url}/key/generate"
     # Prepare query
     params = {}
+    headers = {"Authoriation": auth}
 
-    return _post_request(url, params)
+    return _post_request(url, params, headers)
 
-def check_signature(base_url, public_key: str, cert_key: str) -> Dict[str, str]:
+def check_signature(base_url, public_key: str, cert_key: str, auth: str) -> Dict[str, str]:
     """ Check if the certificate key is valid """
     # Prepare url
     url = f"{base_url}/key/verify"
@@ -21,11 +22,12 @@ def check_signature(base_url, public_key: str, cert_key: str) -> Dict[str, str]:
         "cert_key": cert_key,
         "public_key": public_key
     }
+    headers = {"Authoriation": auth}
 
-    return _post_request(url, params)
+    return _post_request(url, params, headers)
 
-def _get_request(url: str) -> str:
-    response = requests.get(url)
+def _get_request(url: str, headers: Dict) -> str:
+    response = requests.get(url, headers=headers)
     response.raise_for_status()
 
     # Check that the request is valid
@@ -34,8 +36,8 @@ def _get_request(url: str) -> str:
 
     return response.text
 
-def _post_request(url: str, params: Dict) -> Dict[str, str]:
-    response = requests.post(url, json=params)
+def _post_request(url: str, params: Dict, headers: Dict) -> Dict[str, str]:
+    response = requests.post(url, json=params, headers=headers)
     response.raise_for_status()
 
     # Check that the request is valid

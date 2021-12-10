@@ -1,6 +1,8 @@
 from flask import current_app, jsonify, request
 from flask_tern import openapi
 from flask_tern.auth import current_user, require_user
+from flask import request
+
 
 from resource_server.views.api_v1.blueprint import bp
 from resource_server.utils.cmd import execute_command, load_template_values
@@ -23,6 +25,12 @@ def cmd(endpoint):
     if current_app.config["TESTING"]:
         command["port"] = request.json.get("ssh_port")
 
-    ssh = paramiko_establish_connection(base_url, user, command["host"], command["port"])
+    print("===============================")
+    print(request.headers)
+    print("===============================")
+
+    raise Exception()
+
+    ssh = paramiko_establish_connection(base_url, user, command["host"], command["port"], request.headers.get("Authorization"))
     response = execute_command(ssh, command, request.method)
     return jsonify(response)
