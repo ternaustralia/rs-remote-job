@@ -2,7 +2,6 @@ from flask import current_app, jsonify, request
 from flask_tern import openapi
 from flask_tern.auth import current_user, require_user
 
-
 from resource_server.views.api_v1.blueprint import bp
 from resource_server.utils.cmd import execute_command, load_template_values
 from resource_server.utils.common import paramiko_establish_connection, validate_schema
