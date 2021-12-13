@@ -5,10 +5,10 @@ from resource_server.utils.cmd import execute_command, load_template_values, loa
 def test_execute_command(ssh_server, mock_post_request, cmds_path_config, test_command, base_url):
     """ Check if is possible to run commands in the remote host """
 
-    command = load_template_values(validate_schema(cmds_path_config), test_command)
+    command = load_template_values(validate_schema(cmds_path_config), test_command, [])
     command["port"] = ssh_server.port
 
-    ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"])
+    ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"], dict())
     response = execute_command(ssh, command, "GET")
 
     assert isinstance(response, dict)
@@ -19,10 +19,10 @@ def test_execute_command(ssh_server, mock_post_request, cmds_path_config, test_c
 def test_execute_command_post(ssh_server, mock_post_request, cmds_path_config, base_url):
     """ Check if is possible to run commands in the remote host """
 
-    command = load_template_values(validate_schema(cmds_path_config), "test_post_command")
+    command = load_template_values(validate_schema(cmds_path_config), "test_post_command", [])
     command["port"] = ssh_server.port
 
-    ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"])
+    ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"], dict())
     response = execute_command(ssh, command, "POST")
 
     assert isinstance(response, dict)
@@ -33,7 +33,7 @@ def test_execute_command_post(ssh_server, mock_post_request, cmds_path_config, b
 def test_load_template_values(cmds_path_config, test_command):
     """ Check if the shcema validator is correct and loading the parameters """
 
-    command = load_template_values(validate_schema(cmds_path_config), test_command)
+    command = load_template_values(validate_schema(cmds_path_config), test_command, [])
     assert "ls -la ~/ | grep vim" == command["exec"]["command"]
 
 
@@ -41,15 +41,15 @@ def test_load_template_parameters():
     """ Check if the function is able to create the correct parameters structure """
 
     parameters = [
-        {"name": "login", "type": "string", "default": "login"},
-        {"name": "exec", "type": "string", "default": "exec"},
-        {"name": "local", "type": "string", "default": "local"},
-        {"name": "squeue", "type": "string", "default": "/usr/bin/squeue"},
-        {"name": "sacctmgr", "type": "string", "default": "/usr/bin/sacctmgr"},
-        {"name": "clearpass", "type": "string", "default": "~/.vnc/clearpass"},
-        {"name": "scontrol", "type": "string", "default": "/usr/bin/scontrol"},
-        {"name": "scancel", "type": "string", "default": "/usr/bin/scancel"},
-        {"name": "coesra-containers", "type": "string", "default": "/nfs/home/public_share_data/installers/coesra-containers"}
+        {"name": "login", "type": "str", "default": "login"},
+        {"name": "exec", "type": "str", "default": "exec"},
+        {"name": "local", "type": "str", "default": "local"},
+        {"name": "squeue", "type": "str", "default": "/usr/bin/squeue"},
+        {"name": "sacctmgr", "type": "str", "default": "/usr/bin/sacctmgr"},
+        {"name": "clearpass", "type": "str", "default": "~/.vnc/clearpass"},
+        {"name": "scontrol", "type": "str", "default": "/usr/bin/scontrol"},
+        {"name": "scancel", "type": "str", "default": "/usr/bin/scancel"},
+        {"name": "coesra-containers", "type": "str", "default": "/nfs/home/public_share_data/installers/coesra-containers"}
     ]
 
     output = {

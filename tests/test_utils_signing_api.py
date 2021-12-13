@@ -4,7 +4,7 @@ from resource_server.utils.signing_api import get_keys, check_signature
 def test_get_keys(mock_post_request, base_url):
     """ Get new ssh keys and CA """
 
-    keys = get_keys(base_url)
+    keys = get_keys(base_url, dict())
 
     assert isinstance(keys, dict)
     assert "cert_key" in keys.keys()
@@ -16,6 +16,6 @@ def test_get_keys(mock_post_request, base_url):
 def test_check_signature(mock_post_request, get_keys, base_url):
     """ Verify the signature with the public and certificate """
 
-    response = check_signature(base_url, get_keys["public_key"], get_keys["cert_key"])
+    response = check_signature(base_url, get_keys["public_key"], get_keys["cert_key"], dict())
 
     assert response["code"] == 200

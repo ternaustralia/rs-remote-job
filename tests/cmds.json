@@ -1,15 +1,15 @@
 {
     "parameters": [
-        {"name": "login", "type": "string", "default": "127.0.0.1"},
+        {"name": "login", "type": "str", "default": "127.0.0.1"},
         {"name": "port", "type": "int", "default": "22"},
-        {"name": "exec", "type": "string", "default": "exec"},
-        {"name": "local", "type": "string", "default": "127.0.0.1"},
-        {"name": "squeue", "type": "string", "default": "/usr/bin/squeue"},
-        {"name": "sacctmgr", "type": "string", "default": "/usr/bin/sacctmgr"},
-        {"name": "clearpass", "type": "string", "default": "~/.vnc/clearpass"},
-        {"name": "scontrol", "type": "string", "default": "/usr/bin/scontrol"},
-        {"name": "scancel", "type": "string", "default": "/usr/bin/scancel"},
-        {"name": "coesra-containers", "type": "string", "default": "/nfs/home/public_share_data/installers/coesra-containers"}
+        {"name": "exec", "type": "str", "default": "exec"},
+        {"name": "local", "type": "str", "default": "127.0.0.1"},
+        {"name": "squeue", "type": "str", "default": "/usr/bin/squeue"},
+        {"name": "sacctmgr", "type": "str", "default": "/usr/bin/sacctmgr"},
+        {"name": "clearpass", "type": "str", "default": "~/.vnc/clearpass"},
+        {"name": "scontrol", "type": "str", "default": "/usr/bin/scontrol"},
+        {"name": "scancel", "type": "str", "default": "/usr/bin/scancel"},
+        {"name": "coesra-containers", "type": "str", "default": "/nfs/home/public_share_data/installers/coesra-containers"}
     ],
     "endpoints": [
         {
@@ -148,8 +148,8 @@
             "httpMethod": "GET",
             "exec": {
                 "parameters": [
-                    {"name": "vnc", "type": "string", "default": "~/.vnc"},
-                    {"name": "containerpath", "type": "string", "default": "~/.vnc/containerpath"}
+                    {"name": "vnc", "type": "str", "default": "~/.vnc"},
+                    {"name": "containerpath", "type": "str", "default": "~/.vnc/containerpath"}
                 ],
                 "command": "mkdir -p {{ vnc }} ; rm -f {{ clearpass }} ; touch {{ clearpass }} ; chmod 600 {{ clearpass }} ; passwd=$( dd if=/dev/urandom bs=1 count=8 2>/dev/null | md5sum | cut -b 1-8 ) ; echo $passwd > {{ clearpass }} ; cat {{ clearpass }} | vncpasswd -f > ~/.vnc/passwd ; chmod 600 ~/.vnc/passwd ; echo -e '#!/bin/bash\n /opt/singularity/bin/singularity exec -B /nfs/home/EcoStore:/home/EcoStore,/nfs/home/OzFlux:/home/OzFlux,/nfs/home/public_share_data:/home/public_share_data,/nfs/home/public_share_workflow:/home/public_share_workflow {{ coesra-containers }}/{container} vncserver; sleep 36000000 ' | {{ sbatch }} -p batch -s -n 1 -c {ppn} --mem={mem}gb --time={hours}:00:00 -J desktop_'test' -o .vnc/slurm-%j.out; echo {{ coesra-containers }}/{container} > {{ containerpath }}"
             },
@@ -169,7 +169,7 @@
             "httpMethod": "GET",
             "exec": {
                 "parameters": [
-                    {"name": "containerpath", "type": "string", "default": "~/.vnc/containerpath"}
+                    {"name": "containerpath", "type": "str", "default": "~/.vnc/containerpath"}
                 ],
                 "command": "cat {{ containerpath }}"
             },
@@ -280,7 +280,7 @@
             "httpMethod": "GET",
             "exec": {
                 "parameters": [
-                    {"name": "sacct", "type": "string", "default": "/usr/bin/sacct"}
+                    {"name": "sacct", "type": "str", "default": "/usr/bin/sacct"}
                 ],
                 "command": "{{ sacct }} -n -j all -u `whoami` --format=jobid,alloccpus,cputime,reqmem,start,end,elapsed |tr -s ' ' |grep -vwE '(Unknown|batch)'|tail -5 | sort -r -k1 -n"
             },
@@ -318,7 +318,7 @@
             "httpMethod": "GET",
             "exec": {
                 "parameters": [
-                    {"name": "sbatch", "type": "string", "default": "/usr/bin/sbatch"}
+                    {"name": "sbatch", "type": "str", "default": "/usr/bin/sbatch"}
                 ],
                 "command": "echo -e '#!/bin/bash \n/opt/kepler/kepler-2.4/kepler.sh -runwf -nogui {params} {workflow}' | {{ sbatch }} -p batch -N '1' -n '1' --time='48':00:00 -J desktop_'hoangnguyen' -o .vnc/slurm-%j.out"
             },
@@ -431,8 +431,8 @@
             "httpMethod": "GET",
             "exec": {
                 "parameters": [
-                    {"name": "file", "type": "string", "default": "vim"},
-                    {"name": "local", "type": "string", "default": "localhost"}
+                    {"name": "file", "type": "str", "default": "vim"},
+                    {"name": "local", "type": "str", "default": "localhost"}
                 ],
                 "command": "ls -la ~/ | grep {{file}}"
             },
@@ -452,7 +452,7 @@
             "httpMethod": "POST",
             "exec": {
                 "parameters": [
-                    {"name": "file", "type": "string", "default": "vim"}
+                    {"name": "file", "type": "str", "default": "vim"}
                 ],
                 "command": "ls -la ~/ | grep {{file}}"
             },
@@ -472,7 +472,7 @@
             "httpMethod": "POST",
             "exec": {
                 "parameters": [
-                    {"name": "login", "type": "string", "default": "different_host_name"},
+                    {"name": "login", "type": "str", "default": "different_host_name"},
                     {"name": "port", "type": "int", "default": "5522"}
                 ],
                 "command": "{{login}} {{scancel}} {{squeue}}"

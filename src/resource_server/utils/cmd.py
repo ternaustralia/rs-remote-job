@@ -39,11 +39,13 @@ def execute_command(ssh: SSHClient, command: Dict[str, any], method: str) -> Dic
     }
 
 
-def load_template_values(cmd_config: Dict[str, any], target: str) -> Dict[str, any]:
+def load_template_values(cmd_config: Dict[str, any], target: str, params: list) -> Dict[str, any]:
     """ Instance the command to be a candidate to run.
         Parameters
         -------------
+        cmd_config: dict
         targe: str
+        param: list
 
         Return
         -------------
@@ -52,6 +54,7 @@ def load_template_values(cmd_config: Dict[str, any], target: str) -> Dict[str, a
     endpoints = cmd_config['endpoints']
     # Load global parameters
     parameters = load_template_parameters(cmd_config["parameters"])
+    request_params = load_template_parameters(params) 
     command = dict()
 
     for endpoint in endpoints:
@@ -64,7 +67,7 @@ def load_template_values(cmd_config: Dict[str, any], target: str) -> Dict[str, a
         # Convert the Dict into a json template
         template = json.dumps(endpoint)
         # merge both parameter where local_param will replace global params
-        command = json.loads(Template(template).render({** parameters, **local_param}))
+        command = json.loads(Template(template).render({** parameters, **local_param, **request_params}))
 
     return command
 
@@ -84,7 +87,7 @@ def load_template_parameters(params: list) -> Dict[str, any]:
 
         if param["type"] == "int":
             default = int(default)
-        elif param["type"] == "double":
+        elif param["type"] == "float":
             default = float(default)
         elif param["type"] == "bool":
             default = bool(default)
