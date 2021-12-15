@@ -42,9 +42,9 @@ def cmd(endpoint):
         command["port"] = params.get("ssh_port")
 
     headers = {
-        "User-Agent": request.headers.get("User-Agent")
-        "Host": request.headers.get("Host")
-        "Authorization": request.headers.get("Authorization")
+        "User-Agent": request.headers.get("User-Agent"),
+        "Host": request.headers.get("Host"),
+        "Authorization": request.headers.get("Authorization"),
     }
 
     ssh = paramiko_establish_connection(base_url, user, command["host"], command["port"], headers)
