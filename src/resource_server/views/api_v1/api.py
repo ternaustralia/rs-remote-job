@@ -15,6 +15,8 @@ def cmd(endpoint):
     path_file = current_app.config["CMD_PATH_FILE"]
     base_url = current_app.config["SSH_KEYSIGN_BASE_URL"]
     user = current_user.claims[current_app.config["SSH_PRINCIPAL_CLAIM"]]
+    allowed_params = current_app.config["API_ALLOWED_QUERY_PARAMS"]
+
 
 
     if request.method == 'POST':
@@ -23,8 +25,14 @@ def cmd(endpoint):
         params = request.args 
     else: 
         params = dict()
+
+    query_params = dict()
+    for key in params.keys():
+        if key not in allowed_params: 
+            continue
+        query_params[key] = params[key]
     
-    request_params = create_request_param_to_config(params)
+    request_params = create_request_param_to_config(query_params)
 
     # If the schema validator does raise any error then load the right endpoint values
     command = load_template_values(validate_schema(path_file), endpoint, request_params)
@@ -33,6 +41,12 @@ def cmd(endpoint):
     if current_app.config["TESTING"]:
         command["port"] = params.get("ssh_port")
 
-    ssh = paramiko_establish_connection(base_url, user, command["host"], command["port"], request.headers)
+    headers = {
+        "User-Agent": request.headers.get("User-Agent")
+        "Host": request.headers.get("Host")
+        "Authorization": request.headers.get("Authorization")
+    }
+
+    ssh = paramiko_establish_connection(base_url, user, command["host"], command["port"], headers)
     response = execute_command(ssh, command, request.method)
     return jsonify(response)

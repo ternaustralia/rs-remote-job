@@ -73,8 +73,8 @@ def test_cmd_arguments_post(client, basic_auth, mock_post_request, ssh_server, t
         json={
             "ssh_port": ssh_server.port,
             "resolution": "1440x900",
-            "ppn": "2",
-            "mem": "4",
+            "ppn": 2,
+            "mem": 4,
         },
         headers={"Authorization": basic_auth["user"].auth},
     )
