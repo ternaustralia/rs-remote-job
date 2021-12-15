@@ -67,20 +67,15 @@ def validate_schema(path_file: str) -> Dict[str, any]:
 
 def create_request_param_to_config(params: Dict) -> list:
     parameters = list()
-    attributes = dict()
 
     # Transform the values to the correct type 
     for key in params.keys():
         try:
-            attributes[key] = int(params[key])
+            parameters.append({"name": key, "type": "int", "default": int(params[key])})
         except ValueError:
             try: 
-                attributes[key] = float(params[key])
+                parameters.append({"name": key, "type": "float", "default": float(params[key])})
             except ValueError:
-                # allow a str max of 8 characteres
-                attributes[key] = str(params[key])[:8]
-            
-        # Create the default structure for the parameters 
-        parameters.append({"name": key, "type": type(attributes[key]).__name__, "default": attributes[key]})
+                parameters.append({"name": key, "type": "string", "default": str(params[key])})
 
     return parameters

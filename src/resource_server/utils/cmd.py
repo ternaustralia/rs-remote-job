@@ -87,7 +87,7 @@ def load_template_parameters(params: list) -> Dict[str, any]:
 
         if param["type"] == "int":
             default = int(default)
-        elif param["type"] == "float":
+        elif param["type"] == "float" or param["type"] == "double"  :
             default = float(default)
         elif param["type"] == "bool":
             default = bool(default)

@@ -17,10 +17,11 @@
           "type": {
             "type": "string",
             "enum": [
-              "str",
+              "string",
               "int",
               "bool",
-              "float"
+              "float",
+              "double"
             ]
           },
           "default": {

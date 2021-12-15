@@ -41,15 +41,15 @@ def test_load_template_parameters():
     """ Check if the function is able to create the correct parameters structure """
 
     parameters = [
-        {"name": "login", "type": "str", "default": "login"},
-        {"name": "exec", "type": "str", "default": "exec"},
-        {"name": "local", "type": "str", "default": "local"},
-        {"name": "squeue", "type": "str", "default": "/usr/bin/squeue"},
-        {"name": "sacctmgr", "type": "str", "default": "/usr/bin/sacctmgr"},
-        {"name": "clearpass", "type": "str", "default": "~/.vnc/clearpass"},
-        {"name": "scontrol", "type": "str", "default": "/usr/bin/scontrol"},
-        {"name": "scancel", "type": "str", "default": "/usr/bin/scancel"},
-        {"name": "coesra-containers", "type": "str", "default": "/nfs/home/public_share_data/installers/coesra-containers"}
+        {"name": "login", "type": "string", "default": "login"},
+        {"name": "exec", "type": "string", "default": "exec"},
+        {"name": "local", "type": "string", "default": "local"},
+        {"name": "squeue", "type": "string", "default": "/usr/bin/squeue"},
+        {"name": "sacctmgr", "type": "string", "default": "/usr/bin/sacctmgr"},
+        {"name": "clearpass", "type": "string", "default": "~/.vnc/clearpass"},
+        {"name": "scontrol", "type": "string", "default": "/usr/bin/scontrol"},
+        {"name": "scancel", "type": "string", "default": "/usr/bin/scancel"},
+        {"name": "coesra-containers", "type": "string", "default": "/nfs/home/public_share_data/installers/coesra-containers"}
     ]
 
     output = {
