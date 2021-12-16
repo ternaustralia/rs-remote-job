@@ -5,8 +5,6 @@ from typing import Dict
 from jinja2 import Template
 from paramiko import SSHClient
 
-from resource_server.utils.common import create_request_param_to_config
-
 
 def execute_command(ssh: SSHClient, command: Dict[str, any], method: str) -> Dict[str, any]:
     """ Run the specific command and then check for the result """
@@ -41,7 +39,7 @@ def execute_command(ssh: SSHClient, command: Dict[str, any], method: str) -> Dic
     }
 
 
-def load_template_values(cmd_config: Dict[str, any], target: str, params: Dict[str, any]) -> Dict[str, any]:
+def load_template_values(cmd_config: Dict[str, any], target: str, query_params: Dict[str, any]) -> Dict[str, any]:
     """ Instance the command to be a candidate to run.
         Parameters
         -------------
@@ -55,17 +53,8 @@ def load_template_values(cmd_config: Dict[str, any], target: str, params: Dict[s
     """
     endpoints = cmd_config['endpoints']
     # Load global parameters
-    parameters = load_template_parameters(cmd_config["parameters"])
+    parameters = load_template_parameters(cmd_config["parameters"], query_params)
 
-    # Filter and validate request query parameters
-    query_params = dict()
-    for key in params.keys():
-        if key not in cmd_config.get("allowed_query_params", list()): 
-            continue
-        query_params[key] = params[key]
-
-    # Load the correct format and structure to run it in jinja
-    request_params = load_template_parameters(create_request_param_to_config(query_params)) 
     command = dict()
 
     for endpoint in endpoints:
@@ -73,16 +62,16 @@ def load_template_values(cmd_config: Dict[str, any], target: str, params: Dict[s
             continue
 
         # Load local parameters
-        local_param = load_template_parameters(endpoint["exec"]["parameters"])
+        local_param = load_template_parameters(endpoint["exec"]["parameters"], query_params)
 
         # Convert the Dict into a json template
         template = json.dumps(endpoint)
         # merge both parameter where local_param will replace global params
-        command = json.loads(Template(template).render({** parameters, **local_param, **request_params}))
+        command = json.loads(Template(template).render({** parameters, **local_param}))
 
     return command
 
-def load_template_parameters(params: list) -> Dict[str, any]:
+def load_template_parameters(params: list, query_params: Dict[str, any]) -> Dict[str, any]:
     """ Create the render values to match with the template.
         Parameters
         -------------
@@ -92,6 +81,18 @@ def load_template_parameters(params: list) -> Dict[str, any]:
         -------------
         parameters: Dict[str,any]
     """
+    # Check that the query_params are allowed and then replace the defalt value
+    allowed_params = [item["name"] for item in params]
+    for key in query_params.keys():
+        if key not in allowed_params: 
+            continue
+
+        for item in params:
+            if key != item["name"]:
+                continue
+
+            item["default"] = query_params[key]
+
     parameters = dict()
     for param in params:
         default = param["default"]
@@ -105,4 +106,7 @@ def load_template_parameters(params: list) -> Dict[str, any]:
 
         parameters[param["name"]] = default
 
+    print('=====================')
+    print(parameters)
+    print('=====================')
     return parameters

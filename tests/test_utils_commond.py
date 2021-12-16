@@ -1,7 +1,7 @@
 import paramiko
 from paramiko import ssh_exception
 
-from resource_server.utils.common import paramiko_establish_connection, validate_schema, create_request_param_to_config
+from resource_server.utils.common import paramiko_establish_connection, validate_schema 
 from resource_server.utils.cmd import load_template_values
 
 
@@ -45,18 +45,3 @@ def test_paramiko_fail_connection(ssh_server, mock_post_request, base_url, cmds_
         assert True
     else:
         assert False
-
-
-def test_create_request_param_to_config(ssh_server, mock_post_request, base_url, cmds_path_config, test_command):
-    """ Check that the function return the correct list of dictionaries """
-    dictionary={
-        "ssh_port": ssh_server.port,
-        "resolution": "1440x900",
-        "ppn": "2",
-        "mem": "4",
-    }
-
-    output = create_request_param_to_config(dictionary) 
-
-    assert isinstance(output, list)
-    assert isinstance(output[0], dict)

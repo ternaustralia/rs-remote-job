@@ -75,6 +75,7 @@ def test_cmd_arguments_post(client, basic_auth, mock_post_request, ssh_server, t
             "resolution": "1440x900",
             "ppn": 2,
             "mem": 4,
+            "jeff": "ertyuioghj",
         },
         headers={"Authorization": basic_auth["user"].auth},
     )
@@ -85,7 +86,7 @@ def test_cmd_arguments_get(client, basic_auth, mock_post_request, ssh_server, te
     # generate a key pair
 
     response = client.get(
-        f"/api/v1.0/cmd/{test_command}?ssh_port={ssh_server.port}&resolution=1440x900&ppn=2&mem=4",
+        f"/api/v1.0/cmd/{test_command}?ssh_port={ssh_server.port}&resolution=1440x900&ppn=2&mem=4&jeff=adfadsfasdf",
         headers={"Authorization": basic_auth["user"].auth},
     )
 

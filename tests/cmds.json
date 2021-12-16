@@ -433,7 +433,8 @@
             "exec": {
                 "parameters": [
                     {"name": "file", "type": "string", "default": "vim"},
-                    {"name": "local", "type": "string", "default": "localhost"}
+                    {"name": "local", "type": "string", "default": "localhost"},
+                    {"name": "nnp", "type": "int", "default": "2"}
                 ],
                 "command": "ls -la ~/ | grep {{file}}"
             },

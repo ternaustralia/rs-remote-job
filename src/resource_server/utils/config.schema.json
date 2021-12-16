@@ -93,13 +93,6 @@
                 "minItems": 0,
                 "uniqueItems": true
               },
-              "allowed_query_params": {
-                "type": "array",
-                "description": "List of all allowed parameters that can come on the api request", 
-                "items": {
-                  "type": "string"
-                }
-              },
               "command": {
                 "type": "string"
               }

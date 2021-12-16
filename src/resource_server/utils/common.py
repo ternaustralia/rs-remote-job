@@ -63,19 +63,3 @@ def validate_schema(path_file: str) -> Dict[str, any]:
     validate(instance=instance,schema=schema)
 
     return instance
-
-
-def create_request_param_to_config(params: Dict) -> list:
-    parameters = list()
-
-    # Transform the values to the correct type 
-    for key in params.keys():
-        try:
-            parameters.append({"name": key, "type": "int", "default": int(params[key])})
-        except ValueError:
-            try: 
-                parameters.append({"name": key, "type": "float", "default": float(params[key])})
-            except ValueError:
-                parameters.append({"name": key, "type": "string", "default": str(params[key])})
-
-    return parameters

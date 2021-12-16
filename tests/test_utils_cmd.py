@@ -64,5 +64,5 @@ def test_load_template_parameters():
         "coesra-containers": "/nfs/home/public_share_data/installers/coesra-containers"
     }
 
-    response = load_template_parameters(parameters)
+    response = load_template_parameters(parameters, dict())
     assert response == output
