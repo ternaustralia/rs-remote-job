@@ -15,7 +15,7 @@ def test_validate_schema(cmds_path_config):
 
 def test_validate_globals_schema(cmds_path_config):
     """ Test that the template loads the global params but it gets overwrited with the local params"""
-    command = load_template_values(validate_schema(cmds_path_config), "test_globals", [])
+    command = load_template_values(validate_schema(cmds_path_config), "test_globals", dict())
 
     assert isinstance(command, dict)
     assert command["port"] == "5522"
@@ -25,7 +25,7 @@ def test_validate_globals_schema(cmds_path_config):
 def test_paramiko_stablish_connection(ssh_server, mock_post_request, base_url, cmds_path_config, test_command):
     """ Check if paramiko can connect with the host """
 
-    command = load_template_values(validate_schema(cmds_path_config), test_command, [])
+    command = load_template_values(validate_schema(cmds_path_config), test_command, dict())
     command["port"] = ssh_server.port
 
     ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"], dict())
@@ -35,7 +35,7 @@ def test_paramiko_stablish_connection(ssh_server, mock_post_request, base_url, c
 def test_paramiko_fail_connection(ssh_server, mock_post_request, base_url, cmds_path_config):
     """ Check that paramiko is unable to connect with the default port """
 
-    command = load_template_values(validate_schema(cmds_path_config), "test_post_command", [])
+    command = load_template_values(validate_schema(cmds_path_config), "test_post_command", dict())
 
     try:
         ssh = paramiko_establish_connection(base_url, 'user', command["host"], command["port"], dict())

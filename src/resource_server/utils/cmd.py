@@ -5,6 +5,8 @@ from typing import Dict
 from jinja2 import Template
 from paramiko import SSHClient
 
+from resource_server.utils.common import create_request_param_to_config
+
 
 def execute_command(ssh: SSHClient, command: Dict[str, any], method: str) -> Dict[str, any]:
     """ Run the specific command and then check for the result """
@@ -39,7 +41,7 @@ def execute_command(ssh: SSHClient, command: Dict[str, any], method: str) -> Dic
     }
 
 
-def load_template_values(cmd_config: Dict[str, any], target: str, params: list) -> Dict[str, any]:
+def load_template_values(cmd_config: Dict[str, any], target: str, params: Dict[str, any]) -> Dict[str, any]:
     """ Instance the command to be a candidate to run.
         Parameters
         -------------
@@ -54,7 +56,16 @@ def load_template_values(cmd_config: Dict[str, any], target: str, params: list) 
     endpoints = cmd_config['endpoints']
     # Load global parameters
     parameters = load_template_parameters(cmd_config["parameters"])
-    request_params = load_template_parameters(params) 
+
+    # Filter and validate request query parameters
+    query_params = dict()
+    for key in params.keys():
+        if key not in cmd_config.get("allowed_query_params", list()): 
+            continue
+        query_params[key] = params[key]
+
+    # Load the correct format and structure to run it in jinja
+    request_params = load_template_parameters(create_request_param_to_config(query_params)) 
     command = dict()
 
     for endpoint in endpoints:
@@ -87,7 +98,7 @@ def load_template_parameters(params: list) -> Dict[str, any]:
 
         if param["type"] == "int":
             default = int(default)
-        elif param["type"] == "float" or param["type"] == "double"  :
+        elif param["type"] == "float" or param["type"] == "double":
             default = float(default)
         elif param["type"] == "bool":
             default = bool(default)

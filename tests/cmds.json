@@ -151,6 +151,7 @@
                     {"name": "vnc", "type": "string", "default": "~/.vnc"},
                     {"name": "containerpath", "type": "string", "default": "~/.vnc/containerpath"}
                 ],
+                "allowed_query_params": ["ppn", "resolution", "mem", "time"],
                 "command": "mkdir -p {{ vnc }} ; rm -f {{ clearpass }} ; touch {{ clearpass }} ; chmod 600 {{ clearpass }} ; passwd=$( dd if=/dev/urandom bs=1 count=8 2>/dev/null | md5sum | cut -b 1-8 ) ; echo $passwd > {{ clearpass }} ; cat {{ clearpass }} | vncpasswd -f > ~/.vnc/passwd ; chmod 600 ~/.vnc/passwd ; echo -e '#!/bin/bash\n /opt/singularity/bin/singularity exec -B /nfs/home/EcoStore:/home/EcoStore,/nfs/home/OzFlux:/home/OzFlux,/nfs/home/public_share_data:/home/public_share_data,/nfs/home/public_share_workflow:/home/public_share_workflow {{ coesra-containers }}/{container} vncserver; sleep 36000000 ' | {{ sbatch }} -p batch -s -n 1 -c {ppn} --mem={mem}gb --time={hours}:00:00 -J desktop_'test' -o .vnc/slurm-%j.out; echo {{ coesra-containers }}/{container} > {{ containerpath }}"
             },
             "output": {

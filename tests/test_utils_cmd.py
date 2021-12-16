@@ -5,7 +5,7 @@ from resource_server.utils.cmd import execute_command, load_template_values, loa
 def test_execute_command(ssh_server, mock_post_request, cmds_path_config, test_command, base_url):
     """ Check if is possible to run commands in the remote host """
 
-    command = load_template_values(validate_schema(cmds_path_config), test_command, [])
+    command = load_template_values(validate_schema(cmds_path_config), test_command, dict())
     command["port"] = ssh_server.port
 
     ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"], dict())
@@ -19,7 +19,7 @@ def test_execute_command(ssh_server, mock_post_request, cmds_path_config, test_c
 def test_execute_command_post(ssh_server, mock_post_request, cmds_path_config, base_url):
     """ Check if is possible to run commands in the remote host """
 
-    command = load_template_values(validate_schema(cmds_path_config), "test_post_command", [])
+    command = load_template_values(validate_schema(cmds_path_config), "test_post_command", dict())
     command["port"] = ssh_server.port
 
     ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"], dict())
@@ -33,7 +33,7 @@ def test_execute_command_post(ssh_server, mock_post_request, cmds_path_config, b
 def test_load_template_values(cmds_path_config, test_command):
     """ Check if the shcema validator is correct and loading the parameters """
 
-    command = load_template_values(validate_schema(cmds_path_config), test_command, [])
+    command = load_template_values(validate_schema(cmds_path_config), test_command, dict())
     assert "ls -la ~/ | grep vim" == command["exec"]["command"]
 
 
