@@ -99,14 +99,11 @@ def load_template_parameters(params: list, query_params: Dict[str, any]) -> Dict
 
         if param["type"] == "int":
             default = int(default)
-        elif param["type"] == "float" or param["type"] == "double":
+        elif param["type"] in ("float", "double"): 
             default = float(default)
         elif param["type"] == "bool":
             default = bool(default)
 
         parameters[param["name"]] = default
 
-    print('=====================')
-    print(parameters)
-    print('=====================')
     return parameters

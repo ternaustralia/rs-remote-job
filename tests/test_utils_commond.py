@@ -1,5 +1,6 @@
 import paramiko
 from paramiko import ssh_exception
+import pytest
 
 from resource_server.utils.common import paramiko_establish_connection, validate_schema 
 from resource_server.utils.cmd import load_template_values
@@ -37,11 +38,5 @@ def test_paramiko_fail_connection(ssh_server, mock_post_request, base_url, cmds_
 
     command = load_template_values(validate_schema(cmds_path_config), "test_post_command", dict())
 
-    try:
+    with pytest.raises((ssh_exception.NoValidConnectionsError, ssh_exception.SSHException)):
         ssh = paramiko_establish_connection(base_url, 'user', command["host"], command["port"], dict())
-    except ssh_exception.NoValidConnectionsError as err:
-        assert True
-    except ssh_exception.SSHException as err:
-        assert True
-    else:
-        assert False
