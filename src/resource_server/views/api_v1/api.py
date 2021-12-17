@@ -16,13 +16,24 @@ def cmd(endpoint):
     base_url = current_app.config["SSH_KEYSIGN_BASE_URL"]
     user = current_user.claims[current_app.config["SSH_PRINCIPAL_CLAIM"]]
 
+    if request.method == 'POST':
+        params = request.json
+    elif request.method == 'GET':
+        params = request.args 
+    else: 
+        params = dict()
+
     # If the schema validator does raise any error then load the right endpoint values
-    command = load_template_values(validate_schema(path_file), endpoint)
+    command = load_template_values(validate_schema(path_file), endpoint, params)
 
     # Check the app env and get the mocking server port
     if current_app.config["TESTING"]:
-        command["port"] = request.json.get("ssh_port")
+        command["port"] = params.get("ssh_port")
 
-    ssh = paramiko_establish_connection(base_url, user, command["host"], command["port"])
+    headers = {
+        "Authorization": request.headers.get("Authorization"),
+    }
+
+    ssh = paramiko_establish_connection(base_url, user, command["host"], command["port"], headers)
     response = execute_command(ssh, command, request.method)
     return jsonify(response)

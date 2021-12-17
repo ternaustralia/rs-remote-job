@@ -20,6 +20,7 @@
               "string",
               "int",
               "bool",
+              "float",
               "double"
             ]
           },

@@ -39,11 +39,13 @@ def execute_command(ssh: SSHClient, command: Dict[str, any], method: str) -> Dic
     }
 
 
-def load_template_values(cmd_config: Dict[str, any], target: str) -> Dict[str, any]:
+def load_template_values(cmd_config: Dict[str, any], target: str, query_params: Dict[str, any]) -> Dict[str, any]:
     """ Instance the command to be a candidate to run.
         Parameters
         -------------
+        cmd_config: dict
         targe: str
+        param: list
 
         Return
         -------------
@@ -51,7 +53,8 @@ def load_template_values(cmd_config: Dict[str, any], target: str) -> Dict[str, a
     """
     endpoints = cmd_config['endpoints']
     # Load global parameters
-    parameters = load_template_parameters(cmd_config["parameters"])
+    parameters = load_template_parameters(cmd_config["parameters"], query_params)
+
     command = dict()
 
     for endpoint in endpoints:
@@ -59,7 +62,7 @@ def load_template_values(cmd_config: Dict[str, any], target: str) -> Dict[str, a
             continue
 
         # Load local parameters
-        local_param = load_template_parameters(endpoint["exec"]["parameters"])
+        local_param = load_template_parameters(endpoint["exec"]["parameters"], query_params)
 
         # Convert the Dict into a json template
         template = json.dumps(endpoint)
@@ -68,7 +71,7 @@ def load_template_values(cmd_config: Dict[str, any], target: str) -> Dict[str, a
 
     return command
 
-def load_template_parameters(params: list) -> Dict[str, any]:
+def load_template_parameters(params: list, query_params: Dict[str, any]) -> Dict[str, any]:
     """ Create the render values to match with the template.
         Parameters
         -------------
@@ -78,13 +81,25 @@ def load_template_parameters(params: list) -> Dict[str, any]:
         -------------
         parameters: Dict[str,any]
     """
+    # Check that the query_params are allowed and then replace the defalt value
+    allowed_params = [item["name"] for item in params]
+    for key in query_params.keys():
+        if key not in allowed_params: 
+            continue
+
+        for item in params:
+            if key != item["name"]:
+                continue
+
+            item["default"] = query_params[key]
+
     parameters = dict()
     for param in params:
         default = param["default"]
 
         if param["type"] == "int":
             default = int(default)
-        elif param["type"] == "double":
+        elif param["type"] in ("float", "double"): 
             default = float(default)
         elif param["type"] == "bool":
             default = bool(default)
