@@ -47,7 +47,8 @@ def test_cmd_key_error(client, basic_auth, mock_post_request, ssh_server):
     except KeyError as err:
         assert err.args == ('host',)
     else:
-        raise
+        assert response.status_code == 400
+        assert response.json['message'] == 'test_error is not supported!'
 
 
 def test_cmd_wrong_http_methos(client, basic_auth, mock_post_request, ssh_server, test_command):
@@ -63,7 +64,8 @@ def test_cmd_wrong_http_methos(client, basic_auth, mock_post_request, ssh_server
     except Exception as err:
         assert err.args == ("The http-method does not match with the schema, please check your request",)
     else:
-        raise
+        assert response.status_code == 400
+        assert response.json['message'] == "method 'POST' for test_command is not supported!"
 
 
 def test_cmd_arguments_post(client, basic_auth, mock_post_request, ssh_server, test_command):

@@ -1,0 +1,100 @@
+{
+    "parameters": [
+        {"name": "loginHost", "type": "string", "default": "login-node-ip"},
+        {"name": "jobMemory","type": "int", "default": 4}    
+    ],
+    "statics": [
+        {"name": "flavour", "type": "string", "default": "m2.medium"}
+    ],
+    "endpoints": [
+        {
+            "name": "startServer",
+            "async": false,
+            "httpMethod": "GET", 
+            "exec": {
+                "parameters":[
+                    {"name": "jobmemory", "type": "int", "default": 4},
+                    {"name": "jobcpu", "type": "int", "default": 2}
+                ],
+                "command": "mkdir -p ~/.vnc ; rm -f ~/.vnc/clearpass ; touch ~/.vnc/clearpass ; chmod 600 ~/.vnc/clearpass ; passwd=$( dd if=/dev/urandom bs=1 count=8 2>/dev/null | md5sum | cut -b 1-8 ) ; echo $passwd > ~/.vnc/clearpass ; cat ~/.vnc/clearpass | vncpasswd -f > ~/.vnc/passwd ; chmod 600 ~/.vnc/passwd ; echo -e '#!/bin/bash\n /opt/singularity/bin/singularity exec -B /nfs/home/EcoStore:/home/EcoStore,/nfs/home/OzFlux:/home/OzFlux,/nfs/home/public_share_data:/home/public_share_data,/nfs/home/public_share_workflow:/home/public_share_workflow /nfs/home/public_share_data/installers/coesra-containers/{container} vncserver; sleep 36000000 ' | /opt/slurm-14.11.6/bin/sbatch -p batch -s -n 1 -c {ppn} --mem={mem}gb --time={hours}:00:00 -J desktop_'test' -o .vnc/slurm-%j.out; echo /nfs/home/public_share_data/installers/coesra-containers/{container} > ~/.vnc/containerpath"
+            },
+            "output": {
+                "type": "regex",
+                "value": "^Submitted batch job (?P<jobid>(?P<jobidNumber>[0-9]+))$"
+            },
+            "requireMatch": true,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{login}"
+        },
+        {
+            "name": "listAll",
+            "async": false,
+            "httpMethod": "GET", 
+            "exec": {
+                "parameters":[
+                ],
+                "command": "/bin/squeue -u `whoami` -o \\\"%i %L\\\" | tail -n -1"
+            },
+            "output": {
+                "type": "regex",
+                "value": "(?P<jobid>(?P<jobidNumber>[0-9]+)) (?P<remainingWalltime>.*)$"
+            },
+            "requireMatch": true,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{login}"
+        },
+        {
+            "name": "getUsage",
+            "async": true,
+            "httpMethod": "GET", 
+            "exec": {
+                "parameters":[
+                ],
+                "command": "/bin/sacct -n -u `whoami` --format=jobid,alloccpus,cputime,reqmem,start,end,elapsed |tr -s ' ' |grep -vwE '(Unknown|batch|extern)'|tail -5 | sort -r -k1 -n"
+            },
+            "output": {
+                "type": "regex",
+                "value": "^(?P<jobid>[0-9]*) (?P<alloccpus>.+) (?P<cputime>.+) (?P<reqmem>.+) (?P<start>.+) (?P<end>.+) (?P<elapsed>.+)$"
+            },
+            "requireMatch": true,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{login}"
+        },
+        {
+            "name": "stop",
+            "async": true,
+            "httpMethod": "GET", 
+            "exec": {
+                "parameters":[
+                ],
+                "command": "/bin/scancel {jobidNumber}"
+            },
+            "output": null,
+            "requireMatch": false,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{login}"
+        },
+        {
+            "name": "vncDisplay",
+            "async": false,
+            "httpMethod": "GET", 
+            "exec": {
+                "parameters":[
+                ],
+                "command": "cat .vnc/slurm-{jobidNumber}.out"
+            },
+            "output": {
+                "type": "regex",
+                "value": "^.*?New .* desktop is \\S+(?P<vncDisplay>:[0-9]+)\\s*$"
+            },
+            "requireMatch": true,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{login}"
+        }
+    ]
+}

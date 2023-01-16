@@ -1,11 +1,13 @@
-from resource_server.utils.common import paramiko_establish_connection, validate_schema
-from resource_server.utils.cmd import execute_command, load_template_values, load_template_parameters
+import pytest
+from pathlib import Path
+from resource_server.utils.common import paramiko_establish_connection
+from resource_server.utils.cmd import execute_command, get_command, get_parameters, _convert
 
 
 def test_execute_command(ssh_server, mock_post_request, cmds_path_config, test_command, base_url):
     """ Check if is possible to run commands in the remote host """
 
-    command = load_template_values(validate_schema(cmds_path_config), test_command, dict())
+    command = get_command(test_command, dict(), cmds_path_config )
     command["port"] = ssh_server.port
 
     ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"], dict())
@@ -19,7 +21,7 @@ def test_execute_command(ssh_server, mock_post_request, cmds_path_config, test_c
 def test_execute_command_post(ssh_server, mock_post_request, cmds_path_config, base_url):
     """ Check if is possible to run commands in the remote host """
 
-    command = load_template_values(validate_schema(cmds_path_config), "test_post_command", dict())
+    command = get_command("test_post_command", dict(), cmds_path_config )
     command["port"] = ssh_server.port
 
     ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"], dict())
@@ -30,39 +32,68 @@ def test_execute_command_post(ssh_server, mock_post_request, cmds_path_config, b
     assert ssh_server.commands[0] == command['exec']['command']
 
 
-def test_load_template_values(cmds_path_config, test_command):
-    """ Check if the shcema validator is correct and loading the parameters """
-
-    command = load_template_values(validate_schema(cmds_path_config), test_command, dict())
-    assert "ls -la ~/ | grep vim" == command["exec"]["command"]
-
-
-def test_load_template_parameters():
-    """ Check if the function is able to create the correct parameters structure """
-
-    parameters = [
-        {"name": "login", "type": "string", "default": "login"},
-        {"name": "exec", "type": "string", "default": "exec"},
-        {"name": "local", "type": "string", "default": "local"},
-        {"name": "squeue", "type": "string", "default": "/usr/bin/squeue"},
-        {"name": "sacctmgr", "type": "string", "default": "/usr/bin/sacctmgr"},
-        {"name": "clearpass", "type": "string", "default": "~/.vnc/clearpass"},
-        {"name": "scontrol", "type": "string", "default": "/usr/bin/scontrol"},
-        {"name": "scancel", "type": "string", "default": "/usr/bin/scancel"},
-        {"name": "coesra-containers", "type": "string", "default": "/nfs/home/public_share_data/installers/coesra-containers"}
-    ]
-
-    output = {
-        "login":             "login",
-        "exec":              "exec",
-        "local":             "local",
-        "squeue":            "/usr/bin/squeue",
-        "sacctmgr":          "/usr/bin/sacctmgr",
-        "clearpass":         "~/.vnc/clearpass",
-        "scontrol":          "/usr/bin/scontrol",
-        "scancel":           "/usr/bin/scancel",
-        "coesra-containers": "/nfs/home/public_share_data/installers/coesra-containers"
+def test_get_command(cmds_config_file):
+    """ Get the command with the specified parameters """
+    p1 = {
+        'jobmemory': 10,
+        'jobcpu': 3
     }
 
-    response = load_template_parameters(parameters, dict())
-    assert response == output
+    commanditem = get_command('command1', p1, cmds_config_file)
+    assert commanditem['exec']['command'] == f"command1 {p1['jobmemory']} {p1['jobcpu']}"
+    assert commanditem['host'] == 'login-node-ip'  # match to the parameter 'loginHost' in config file
+
+
+def test_get_parameters(command_test_item):
+    """ Test that the parameter values are set """
+    p1 = {
+        'jobmemory': 10,
+        'jobcpu': 3
+    }
+    gparams = [
+        {"name": "loginHost", "type": "string", "default": "login-node-ip"},
+        {"name": "loginPort", "type": "int", "default": 4000}
+    ]
+
+    # Check for pass-in values as parameters
+    params = get_parameters('command1', p1, command_test_item, gparams)
+    expected_params = {'loginHost': "login-node-ip", "loginPort": 4000}
+    expected_params.update(p1)
+    assert params == expected_params
+
+
+def test_get_parameters_default(command_test_item):
+    # Check for default value for parameter
+    expected_params = {'jobmemory': 4, 'jobcpu': 2}
+    params = get_parameters('command1', {'jobcpu': 2}, command_test_item, gparams=[])
+    assert params == expected_params
+
+
+def test_get_parameters_missing_param(command_test_item):
+    # Check that exception is raised for missing parameter
+    with pytest.raises(Exception) as e1:
+        params = get_parameters('command1', {}, command_test_item, gparams=[])
+        assert e1.value.args[0] == "Missing parameter 'jobcpu' for command command1"
+
+def test_convert():
+    vars = [
+        ('string', 'string-value', 'string-value'),
+        ('int', 100, 100),
+        ('int', '101', 101),
+        ('int', 100.9, 100),
+        ('float', 1.6, 1.6),
+        ('float', '1.6', 1.6),
+        ('double', 1.766, 1.766),
+        ('double', '1.766', 1.766),
+        ('bool', 1, True),
+        ('bool', 'true', True),
+        ('bool', 'True', True),
+        ('bool', True, True),
+        ('bool', 0, False),
+        ('bool', 'false', False),
+        ('bool', 'False', False),
+        ('bool', False, False)
+    ]
+
+    for otype, value, expected in vars:
+        assert _convert(value, otype) == expected

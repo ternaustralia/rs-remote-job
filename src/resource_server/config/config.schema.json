@@ -1,0 +1,159 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/ternaustralia/rs-remote-job/config.schema.json",
+    "title": "Endpoints",
+    "description": "Config json for resource server to define endpoints",
+    "type": "object",
+    "properties": {
+      "parameters": {
+        "description": "List of parameters supplied to this resource server",
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "oneOf": [
+                        {"type": "string"},
+                        {"type": "number"}
+                    ]
+                },
+                "default": {
+                    "type": "string"
+                }
+            },
+            "required": [ "name", "type"]
+        },
+        "minItems": 0,
+        "uniqueItems": true
+      },
+      "statics": {
+        "description": "List of endpoints returning constant values - GET only",
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "oneOf": [
+                        {"type": "string"},
+                        {"type": "number"}
+                    ]
+                },
+                "default": {
+                    "type": "string"
+                }
+            },
+            "required": [ "name", "type"]
+        }
+      },
+      "endpoints": {
+          "description": "List of endpoints to be defined",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "name of this endpoint"
+                },
+                "async": {
+                    "type": "boolean"
+                },
+                "httpMethod": {
+                    "type": {
+                        "oneOf": [
+                            {"type": "GET"},
+                            {"type": "POST"},
+                            {"type": "DELETE"}
+                        ]
+                    }
+                },
+
+                "exec": {
+                    "type": "object",
+                    "description": "The command to be executed in login host. Note that the paramters defined in {} needs to be substitued with paramers supplied to this command, and server",
+                    "properties": {
+                        "parameters": {
+                            "type": "array",
+                            "description": "List of parameters supplied to this command/endpoint",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "oneOf": [
+                                            {"type": "string"},
+                                            {"type": "number"}
+                                        ]
+                                    },
+                                    "default": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [ "name", "type"]
+                            },
+                            "minItems": 0,
+                            "uniqueItems": true
+                        },
+                        "command": {
+                            "description": "command to execute",
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "description": "jinja2 format parameter"
+                            }
+
+                        }
+                    },
+                    "required": [ "parameters", "command"]
+                },
+                
+                "output": {
+                    "type": "object",
+                    "description": "The output format, if defined in string then ignore the exec part",
+                    "properties": {
+                        "type": {
+                            "type": {
+                                "oneOf": [
+                                    {"type": "string"},
+                                    {"type": "regex"}
+                                ]
+                            }
+                        },
+                        "value": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [ "type", "value"]
+                },
+
+
+                "requireMatch": {
+                    "type": "boolean"
+                },
+                "failFatal": {
+                    "type": "boolean"
+                },
+                "formatFatal": {
+                    "type": "boolean"
+                },
+                "host": {
+                    "type": "string"
+                }
+
+            },
+            "required": [ "name", "async", "httpMethod", "output", "requireMatch", "failFatal", "formatFatal", "host"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+      }
+    },
+    "required": [ "Commands" ]
+  }

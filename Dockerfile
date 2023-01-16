@@ -9,7 +9,7 @@ RUN apk add --no-cache \
   python3 \
   python3-dev \
   build-base \
-  libffi-dev 
+  libffi-dev
 
 # Pkgs hard / slow / annoying to build from sourc (also those of which version does not matter too much)
 RUN apk add --no-cache \

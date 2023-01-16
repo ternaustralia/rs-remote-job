@@ -1,7 +1,7 @@
 import re
 import json
 
-from typing import Dict
+from typing import Dict, List
 from jinja2 import Template
 from paramiko import SSHClient
 
@@ -39,71 +39,60 @@ def execute_command(ssh: SSHClient, command: Dict[str, any], method: str) -> Dic
     }
 
 
-def load_template_values(cmd_config: Dict[str, any], target: str, query_params: Dict[str, any]) -> Dict[str, any]:
-    """ Instance the command to be a candidate to run.
-        Parameters
-        -------------
-        cmd_config: dict
-        targe: str
-        param: list
+def _convert(obj, otype):
+    # convert the object to the type specified
+    if obj is None:
+        return None
+    if otype == "int":
+        return int(obj)
+    elif otype in ("float", "double"):
+        return float(obj)
+    elif otype == "bool":
+        if obj in ['true', 'True', 1, True]:
+            return True
+        if obj in ['false', 'False', 0, False]:
+            return False
+        raise Exception(f"Invalid boolean value {obj} ")
+    return str(obj)
+
+
+def get_command(cmd: str, qparams: Dict[str, any], config_file:str) -> Dict[str, any]:
+    """ Return the command with all its parameters and associated values set.
+        Parameters:
+        cmd: the command to be executed
+        qparams: parameters to the command
+        config_file: path to command configuration file
 
         Return
         -------------
         command: Dict[str,any]
     """
-    endpoints = cmd_config['endpoints']
-    # Load global parameters
-    parameters = load_template_parameters(cmd_config["parameters"], query_params)
+    with open(config_file, 'r') as f1:
+        cmd_config = json.load(f1)
 
     command = dict()
-
-    for endpoint in endpoints:
-        if endpoint["name"] != target:
-            continue
-
-        # Load local parameters
-        local_param = load_template_parameters(endpoint["exec"]["parameters"], query_params)
-
-        # Convert the Dict into a json template
-        template = json.dumps(endpoint)
-        # merge both parameter where local_param will replace global params
-        command = json.loads(Template(template).render({** parameters, **local_param}))
-
+    for cmditem in cmd_config['endpoints']:
+        if cmditem['name'] == cmd:
+            params = get_parameters(cmd, qparams, cmditem, cmd_config['parameters'])
+            command = json.loads(Template(json.dumps(cmditem)).render(params))
+            break
     return command
 
-def load_template_parameters(params: list, query_params: Dict[str, any]) -> Dict[str, any]:
-    """ Create the render values to match with the template.
-        Parameters
-        -------------
-        params: list
 
-        Return
-        -------------
-        parameters: Dict[str,any]
+def get_parameters(cmd: str, params: Dict[str, any], cmditem: Dict[str, any], gparams: List) -> Dict[str, any]:
+    """ Validate the command's parameters against the command configuration,
+        and return all the parameters required for the command.
     """
-    # Check that the query_params are allowed and then replace the defalt value
-    allowed_params = [item["name"] for item in params]
-    for key in query_params.keys():
-        if key not in allowed_params: 
-            continue
 
-        for item in params:
-            if key != item["name"]:
-                continue
-
-            item["default"] = query_params[key]
-
+    # Get all the command parameters, and fill it with default values if not specified
     parameters = dict()
-    for param in params:
-        default = param["default"]
+    cmd_pnames = [ p['name'] for p in cmditem['exec']['parameters'] ]
+    for p in cmditem['exec']['parameters'] + gparams:
+        pname = p['name']
+        parameters[pname] = _convert(params.get(pname, p.get('default')), p['type'])
 
-        if param["type"] == "int":
-            default = int(default)
-        elif param["type"] in ("float", "double"): 
-            default = float(default)
-        elif param["type"] == "bool":
-            default = bool(default)
-
-        parameters[param["name"]] = default
+        # Command parameter must have value
+        if pname in cmd_pnames and parameters[pname] is None:
+            raise Exception(f"Missing parameter '{pname}' for command {cmd}")
 
     return parameters

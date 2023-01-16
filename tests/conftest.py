@@ -16,6 +16,36 @@ def cmds_path_config():
 
 
 @pytest.fixture
+def cmds_config_file():
+    """Return path to cmds.json config file."""
+    return str(Path(__file__).with_name("cmdconfig.json"))
+
+
+@pytest.fixture
+def command_test_item():
+    return {
+        "name": "command1",
+        "async": False,
+        "httpMethod": "GET",
+        "exec": {
+            "parameters":[
+                {"name": "jobmemory", "type": "int", "default": 4},
+                {"name": "jobcpu", "type": "int"}
+            ],
+            "command": "command1 {{jobmemory}} {{jobcpu}}"
+        },
+        "output": {
+            "type": "regex",
+            "value": "^Submitted batch job (?P<jobid>(?P<jobidNumber>[0-9]+))$"
+        },
+        "requireMatch": True,
+        "failFatal": True,
+        "formatFatal": False,
+        "host": "{{loginHost}}"
+    }
+
+
+@pytest.fixture
 def test_command():
     """Return string with the command to run as a test"""
     return "test_command"
@@ -54,13 +84,13 @@ def client(app, basic_auth):  # noqa
     return app.test_client()
 
 
-@pytest.fixture
-def ssh_server():
+@pytest.fixture(scope="session")
+def ssh_server(request):
     with mock_ssh_server.Server() as server:
         yield server
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def get_keys():
     return {
         "private_key": Path(__file__).with_name("test_user.key").read_text(),
@@ -87,5 +117,3 @@ def mock_post_request(monkeypatch, get_keys):
             return {"message": "Error", "code": 404}
 
     monkeypatch.setattr("resource_server.utils.signing_api._post_request", _post_request)
-
-
