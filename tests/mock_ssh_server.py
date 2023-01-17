@@ -78,14 +78,16 @@ class Server:
 
     host = "127.0.0.1"
 
-    def __init__(self):
+    def __init__(self, port=22):
         self._socket = None
         self._thread = None
         self._handler = None
+        self._port = port
 
     def __enter__(self):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._socket.bind((self.host, 0))
+        self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self._socket.bind((self.host, self._port))
         self._socket.listen(5)
         self._thread = threading.Thread(target=self._run)
         self._thread.setDaemon(True)
@@ -112,12 +114,14 @@ class Server:
                 t.start()
 
     def __exit__(self, *exc_info):
+        print("existing and close socket for server")
         try:
             self._socket.shutdown(socket.SHUT_RDWR)
             self._socket.close()
         except Exception as e:
             print(e)
             # pass
+        
         self._socket = None
         self._thread = None
         self._handler = None

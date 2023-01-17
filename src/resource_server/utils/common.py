@@ -13,7 +13,7 @@ except ImportError:
     from importlib_resources import files as pkg_files
 
 
-def paramiko_establish_connection(base_url: str, user: str, host: str, port: int) -> paramiko.SSHClient:
+def paramiko_establish_connection(base_url: str, user: str, host: str, port: int, headers: Dict) -> paramiko.SSHClient:
     """ User paramiko to stablish a connection to the master node
         Parameters
         -------------
@@ -22,9 +22,12 @@ def paramiko_establish_connection(base_url: str, user: str, host: str, port: int
         ssh
     """
     ssh = paramiko.SSHClient()
-    keys = get_keys(base_url)
+
+    # Call ssh-cert-service to generate key-pairs and associated cert-key
+    keys = get_keys(base_url, headers)
 
     # Create temporary dicrectory and storage the keys there
+    # TODO: support other than RSA key
     ssh_key = paramiko.RSAKey.from_private_key(io.StringIO(keys['private_key']))
     ssh_key.load_certificate(keys['cert_key'])
 
@@ -36,26 +39,26 @@ def paramiko_establish_connection(base_url: str, user: str, host: str, port: int
         username=user,
         port=port,
         pkey=ssh_key,
+#        key_filename=key['cert_key'],
         look_for_keys=False
     )
-
     return ssh
 
 def validate_schema(path_file: str) -> Dict[str, any]:
-    """ Load the json cmd_config and the schema validator, check if it works
+    """ Load the command configuration JSON file and validate using the schema validator
 
         Parameters
         -------------
         path_file: str
-            The path where the cmd_confg is located
+            path to the command JSON configuration file
         Return
         -------------
         instance: dict
 
     """
 
-    with (pkg_files(importlib.util.find_spec(__name__).parent) / "config.schema.json").open("r") as paht_schema:
-        schema = json.load(paht_schema)
+    with (pkg_files(importlib.util.find_spec(__name__).parent) / "config.schema.json").open("r") as schema_file:
+        schema = json.load(schema_file)
 
     with open(path_file) as path_instance:
         instance = json.load(path_instance)

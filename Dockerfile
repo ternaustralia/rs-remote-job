@@ -1,4 +1,4 @@
-ARG ALPINE_VERSION=3.13
+ARG ALPINE_VERSION=3.15
 
 # BUILD and install code
 FROM alpine:${ALPINE_VERSION} as builder
@@ -8,7 +8,8 @@ RUN apk add --no-cache \
   git \
   python3 \
   python3-dev \
-  g++
+  build-base \
+  libffi-dev
 
 # Pkgs hard / slow / annoying to build from sourc (also those of which version does not matter too much)
 RUN apk add --no-cache \
@@ -41,10 +42,6 @@ COPY dist/ /workspace/dist/
 # Install pkg
 RUN pip install --no-cache-dir /workspace/dist/*.whl
 
-
-
-
-
 # BUILD space optimised final image, based on installed code from builder
 FROM alpine:${ALPINE_VERSION} as runner
 
@@ -73,9 +70,6 @@ ENV FLASK_APP=resource_server \
   FLASK_ENV=production
 
 USER 1000
-
-# TODO: setup ENTRYPOINT if needed and default CMD
-ENTRYPOINT ["/docker_entrypoint.sh"]
 
 # CMD ["gunicorn", "--bind=:5000", "--workers=2", "--threads=4", "--forwarded-allow-ips='*'",  "--statsd-host=statsd-exporter.services:9125", "--statsd-prefix=ecoimages_portal_api", "resource_server:create_app()"]
 

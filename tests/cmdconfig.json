@@ -1,0 +1,31 @@
+{
+    "parameters": [
+        {"name": "loginHost", "type": "string", "default": "login-node-ip"},
+        {"name": "loginPort", "type": "int", "default": 4}
+    ],
+    "statics": [
+        {"name": "flavour", "type": "string", "default": "m2.medium"}
+    ],
+    "endpoints": [
+        {
+            "name": "command1",
+            "async": false,
+            "httpMethod": "GET", 
+            "exec": {
+                "parameters":[
+                    {"name": "jobmemory", "type": "int", "default": 4},
+                    {"name": "jobcpu", "type": "int"}
+                ],
+                "command": "command1 {{jobmemory}} {{jobcpu}}"
+            },
+            "output": {
+                "type": "regex",
+                "value": "^Submitted batch job (?P<jobid>(?P<jobidNumber>[0-9]+))$"
+            },
+            "requireMatch": true,
+            "failFatal": true,
+            "formatFatal": false,
+            "host": "{{loginHost}}"
+        }
+    ]
+}
