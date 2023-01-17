@@ -1,6 +1,5 @@
 import re
 import json
-
 from typing import Dict, List
 from jinja2 import Template
 from paramiko import SSHClient
@@ -13,7 +12,6 @@ def execute_command(ssh: SSHClient, command: Dict[str, any], method: str) -> Dic
         raise Exception("The http-method does not match with the schema, please check your request")
 
     cmd = command["exec"]["command"]
-
     stdin, stdout, stderr = ssh.exec_command(cmd)
     lines = stdout.readlines()
 
