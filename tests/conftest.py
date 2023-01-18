@@ -3,6 +3,7 @@ import pytest
 import mock_ssh_server
 import requests
 
+import json
 from pathlib import Path
 from flask_tern.testing.fixtures import basic_auth as base_auth  # noqa
 from flask_tern.testing.fixtures import cache_spec, monkeypatch_session  # noqa
@@ -16,33 +17,14 @@ def cmds_path_config():
 
 
 @pytest.fixture
-def cmds_config_file():
-    """Return path to cmds.json config file."""
-    return str(Path(__file__).with_name("cmdconfig.json"))
+def command_test_item(cmds_path_config):
+    """Return a command item with name 'command1'"""
+    with open(cmds_path_config) as f1:
+        config = json.load(f1)
 
-
-@pytest.fixture
-def command_test_item():
-    return {
-        "name": "command1",
-        "async": False,
-        "httpMethod": "GET",
-        "exec": {
-            "parameters":[
-                {"name": "jobmemory", "type": "int", "default": 4},
-                {"name": "jobcpu", "type": "int"}
-            ],
-            "command": "command1 {{jobmemory}} {{jobcpu}}"
-        },
-        "output": {
-            "type": "regex",
-            "value": "^Submitted batch job (?P<jobid>(?P<jobidNumber>[0-9]+))$"
-        },
-        "requireMatch": True,
-        "failFatal": True,
-        "formatFatal": False,
-        "host": "{{loginHost}}"
-    }
+    for cmditem in config['endpoints']:
+        if cmditem['name'] == 'command1':
+            return cmditem
 
 
 @pytest.fixture

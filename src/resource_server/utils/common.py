@@ -43,26 +43,3 @@ def paramiko_establish_connection(base_url: str, user: str, host: str, port: int
         look_for_keys=False
     )
     return ssh
-
-def validate_schema(path_file: str) -> Dict[str, any]:
-    """ Load the command configuration JSON file and validate using the schema validator
-
-        Parameters
-        -------------
-        path_file: str
-            path to the command JSON configuration file
-        Return
-        -------------
-        instance: dict
-
-    """
-
-    with (pkg_files(importlib.util.find_spec(__name__).parent) / "config.schema.json").open("r") as schema_file:
-        schema = json.load(schema_file)
-
-    with open(path_file) as path_instance:
-        instance = json.load(path_instance)
-
-    validate(instance=instance,schema=schema)
-
-    return instance

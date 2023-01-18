@@ -7,9 +7,7 @@ def test_get_keys(mock_post_request, base_url):
     keys = get_keys(base_url, dict())
 
     assert isinstance(keys, dict)
-    assert "cert_key" in keys.keys()
-    assert "public_key" in keys.keys()
-    assert "private_key" in keys.keys()
+    assert {"cert_key", "public_key", "private_key"} == set(keys.keys())
 
 
 # TODO: should verify that check_signature issues correct _post_request
@@ -17,5 +15,4 @@ def test_check_signature(mock_post_request, get_keys, base_url):
     """ Verify the signature with the public and certificate """
 
     response = check_signature(base_url, get_keys["public_key"], get_keys["cert_key"], dict())
-
-    assert response["code"] == 200
+    assert (response["code"] == 200) & (response["message"] == "success")

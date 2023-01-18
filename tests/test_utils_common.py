@@ -1,8 +1,6 @@
 import paramiko
-from paramiko import ssh_exception
 import pytest
-
-from resource_server.utils.common import paramiko_establish_connection, validate_schema 
+from resource_server.utils.common import paramiko_establish_connection 
 from resource_server.utils.cmd import get_command
 
 
@@ -12,6 +10,5 @@ def test_paramiko_establish_connection(ssh_server, mock_post_request, base_url, 
     command = get_command(test_command, dict(), cmds_path_config)
     command["port"] = ssh_server.port
     
-
     ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"], dict())
     assert isinstance(ssh, paramiko.SSHClient)
