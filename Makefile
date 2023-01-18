@@ -1,5 +1,5 @@
 
-IMAGE_REPO=ternau
+IMAGE_REPO=registry.rc.nectar.org.au/tern-data-integration
 IMAGE_NAME=resource_server
 IMAGE_TAG=latest
 
@@ -10,7 +10,7 @@ IMAGE=$(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)
 
 build:
 	rm -fr $(CURDIR)/dist/*.whl
-	docker run --rm -it -v $(CURDIR):/workspace -w /workspace python:3.8 python setup.py bdist_wheel
+	docker run --rm -it -v $(CURDIR):/workspace -w /workspace python:3.10 python setup.py bdist_wheel
 	docker build -t $(IMAGE) .
 
 test:

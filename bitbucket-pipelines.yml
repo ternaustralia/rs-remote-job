@@ -1,4 +1,4 @@
-image: ternau/bb-python:3.8-alpine
+image: ternau/bb-python:3.10-alpine
 
 definitions:
   # generic re-usable steps
@@ -6,7 +6,7 @@ definitions:
     - step: &envstep
       # use a multiline step to set environment variables
       - script: &setenv |
-          export IMAGE_NAME=ternau/resource_server
+          export IMAGE_NAME=registry.rc.nectar.org.au/tern-data-integration/resource_server
 
     - step: &build-test
         script:
@@ -42,7 +42,7 @@ definitions:
           - export IMAGE_TAG=${VERSION/+/-}
           # re-tag image
           - docker tag $IMAGE_NAME $IMAGE_NAME:$IMAGE_TAG
-          - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+          - docker login registry.rc.nectar.org.au --username $REGISTRY_NECTAR_USERNAME --password $REGISTRY_NECTAR_PASSWORD
           - docker push $IMAGE_NAME
           - docker push $IMAGE_NAME:$IMAGE_TAG
         services:

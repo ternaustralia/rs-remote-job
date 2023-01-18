@@ -454,13 +454,13 @@
             "httpMethod": "POST",
             "exec": {
                 "parameters": [
-                    {"name": "file", "type": "string", "default": "vim"}
+                    {"name": "file", "type": "string", "default": "vim-yong"}
                 ],
                 "command": "ls -la ~/ | grep {{file}}"
             },
             "output": {
                 "type":"regex/string",
-                "value": "(vim)"
+                "value": "(vim)-(yong)"
             },
             "async": false,
             "failFatal": true,
