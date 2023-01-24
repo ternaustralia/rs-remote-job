@@ -1,0 +1,103 @@
+# Configuration settings section
+config:
+  - name: ssh_host
+    type: string
+    default: login-node-ip
+  - name: ssh_port
+    type: integer
+    default: 22
+# Static constants section
+statics:
+  - description: CoESRA cluster; require a TERN login
+# Endpoint definations section
+endpoints:
+  - name: startServer
+    description: Start the remote desktop server (i.e. vcn server)
+    httpMethod: GET
+    parameters:
+      - name: jobmemory
+        description: Memory allocated to job in GB
+        schema:
+          type: integer
+          default: 4
+      - name: jobcpu
+        description: Number of CPU allocated to job
+        schema:
+          type: integer
+          default: 2
+      - name: jobhour
+        description: Duration (in hours) of job allowed
+        schema:
+          type: integer
+          default: 24
+      - name: resolution
+        description: Resolution of the remote desktop screen to set to
+        schema:
+          type: string
+          default: 1920x1080
+          enum:
+            - 1920x1080
+    exec:
+      command: |
+        mkdir -p ~/.vnc 
+        rm -f ~/.vnc/clearpass 
+        touch ~/.vnc/clearpass 
+        chmod 600 ~/.vnc/clearpass 
+        passwd=$( dd if=/dev/urandom bs=1 count=8 2>/dev/null | md5sum | cut -b 1-8 ) 
+        echo $passwd > ~/.vnc/clearpass 
+        cat ~/.vnc/clearpass | vncpasswd -f > ~/.vnc/passwd 
+        chmod 600 ~/.vnc/passwd 
+        echo -e '#!/bin/bash vncserver -geometry {{resolution}}; sleep 36000000 ' | /opt/slurm-14.11.6/bin/sbatch -p batch -s -n 1 -c {{jobcpu}) --mem={{jobmemory}}gb --time={{jobhour}}:00:00 -J desktop_'test' -o .vnc/slurm-%j.out
+    output:
+      type: regex
+      value: ^Submitted batch job (?P<jobid>(?P<jobidNumber>[0-9]+))$
+      requireMatch: true
+    connection: ssh
+  - name: listAll
+    httpMethod: GET
+    parameters: []
+    exec:
+      command: /bin/squeue -u `whoami` -o \"%i %L\" | tail -n -1
+    output:
+      type: regex
+      value: (?P<jobid>(?P<jobidNumber>[0-9]+)) (?P<remainingWalltime>.*)$
+      requireMatch: true
+    connection: ssh
+  - name: getUsage
+    httpMethod: GET
+    parameters: []
+    exec:
+      command: >-
+        /bin/sacct -n -u `whoami`
+        --format=jobid,alloccpus,cputime,reqmem,start,end,elapsed |tr -s ' '
+        |grep -vwE '(Unknown|batch|extern)'|tail -5 | sort -r -k1 -n
+    output:
+      type: regex
+      value: >-
+        ^(?P<jobid>[0-9]*) (?P<alloccpus>.+) (?P<cputime>.+) (?P<reqmem>.+)
+        (?P<start>.+) (?P<end>.+) (?P<elapsed>.+)$
+      requireMatch: true
+    connection: ssh
+  - name: stop
+    httpMethod: GET
+    parameters:
+      - name: jobid
+        schema:
+          type: integer
+    exec:
+      command: /bin/scancel {{jobid}}
+    output: null
+    connection: ssh
+  - name: running
+    httpMethod: GET
+    parameters:
+      - name: jobid
+        schema:
+          type: integer
+    exec:
+      command: '"/usr/bin/scontrol show job {{jobid}}"'
+    output:
+      type: regex
+      value: JobState=RUNNING
+      requireMatch: true
+    connection: ssh

@@ -1,106 +1,89 @@
 {
-    "parameters": [
-        {"name": "loginHost", "type": "string", "default": "login-node-ip"},
-        {"name": "loginPort", "type": "int", "default": 22}
+    "config": [
+        {"name": "ssh_host", "type": "string", "default": "login-node-ip"},
+        {"name": "ssh_port", "type": "integer", "default": 22}
     ],
+    "statics": [
+        {"description": "CoESRA cluster; require a TERN login"}
+    ],  
     "endpoints": [
         {
             "name": "startServer",
-            "async": false,
+            "description": "Start the remote desktop server (i.e. vcn server)",
             "httpMethod": "GET", 
+            "parameters":[
+                {"name": "jobmemory", "schema": {"type": "integer", "default": 4}},
+                {"name": "jobcpu", "schema": {"type": "integer", "default": 2}},
+                {"name": "jobhour", "schema": {"type": "integer", "default": 24}},
+                {"name": "resolution", "schema": {"type": "string", "default": "1920x1080", "enum": ["1920x1080"]}}
+            ],
             "exec": {
-                "parameters":[
-                    {"name": "jobmemory", "type": "int", "default": 4},
-                    {"name": "jobcpu", "type": "int", "default": 2},
-                    {"name": "jobhour", "type": "int", "default": 24},
-                    {"name": "oscontainer", "type": "string", "default": "Ubuntu16.04"}
-                ],
-                "command": "mkdir -p ~/.vnc ; rm -f ~/.vnc/clearpass ; touch ~/.vnc/clearpass ; chmod 600 ~/.vnc/clearpass ; passwd=$( dd if=/dev/urandom bs=1 count=8 2>/dev/null | md5sum | cut -b 1-8 ) ; echo $passwd > ~/.vnc/clearpass ; cat ~/.vnc/clearpass | vncpasswd -f > ~/.vnc/passwd ; chmod 600 ~/.vnc/passwd ; echo -e '#!/bin/bash\n /opt/singularity/bin/singularity exec -B /nfs/home/EcoStore:/home/EcoStore,/nfs/home/OzFlux:/home/OzFlux,/nfs/home/public_share_data:/home/public_share_data,/nfs/home/public_share_workflow:/home/public_share_workflow /nfs/home/public_share_data/installers/coesra-containers/{container} vncserver; sleep 36000000 ' | /opt/slurm-14.11.6/bin/sbatch -p batch -s -n 1 -c {{jobcpu}} --mem={{jobmemory}}gb --time={{jobhour}}:00:00 -J desktop_'test' -o .vnc/slurm-%j.out; echo /nfs/home/public_share_data/installers/coesra-containers/{{oscontainer}} > ~/.vnc/containerpath"
+                "command": "mkdir -p ~/.vnc ; rm -f ~/.vnc/clearpass ; touch ~/.vnc/clearpass ; chmod 600 ~/.vnc/clearpass ; passwd=$( dd if=/dev/urandom bs=1 count=8 2>/dev/null | md5sum | cut -b 1-8 ) ; echo $passwd > ~/.vnc/clearpass ; cat ~/.vnc/clearpass | vncpasswd -f > ~/.vnc/passwd ; chmod 600 ~/.vnc/passwd ; echo -e '#!/bin/bash\n vncserver -geometry {{resolution}}; sleep 36000000 ' | /opt/slurm-14.11.6/bin/sbatch -p batch -s -n 1 -c {{jobcpu}) --mem={{jobmemory}}gb --time={{jobhour}}:00:00 -J desktop_'test' -o .vnc/slurm-%j.out"
             },
             "output": {
                 "type": "regex",
-                "value": "^Submitted batch job (?P<jobid>(?P<jobidNumber>[0-9]+))$"
+                "value": "^Submitted batch job (?P<jobid>(?P<jobidNumber>[0-9]+))$",
+                "requireMatch": true
             },
-            "requireMatch": true,
-            "failFatal": true,
-            "formatFatal": false,
-            "host": "{{loginHost}}",
-            "port": "{{loginPort}}"
+            "connection": "ssh"
         },
         {
             "name": "listAll",
-            "async": false,
             "httpMethod": "GET", 
+            "parameters":[
+            ],
             "exec": {
-                "parameters":[
-                ],
                 "command": "/bin/squeue -u `whoami` -o \\\"%i %L\\\" | tail -n -1"
             },
             "output": {
                 "type": "regex",
-                "value": "(?P<jobid>(?P<jobidNumber>[0-9]+)) (?P<remainingWalltime>.*)$"
+                "value": "(?P<jobid>(?P<jobidNumber>[0-9]+)) (?P<remainingWalltime>.*)$",
+                "requireMatch": true
             },
-            "requireMatch": true,
-            "failFatal": true,
-            "formatFatal": false,
-            "host": "{{loginHost}}",
-            "port": "{{loginPort}}"
+            "connection": "ssh"
         },
         {
             "name": "getUsage",
-            "async": true,
             "httpMethod": "GET", 
-            "exec": {
-                "parameters":[
-                ],
+            "parameters":[
+            ],
+        "exec": {
                 "command": "/bin/sacct -n -u `whoami` --format=jobid,alloccpus,cputime,reqmem,start,end,elapsed |tr -s ' ' |grep -vwE '(Unknown|batch|extern)'|tail -5 | sort -r -k1 -n"
             },
             "output": {
                 "type": "regex",
-                "value": "^(?P<jobid>[0-9]*) (?P<alloccpus>.+) (?P<cputime>.+) (?P<reqmem>.+) (?P<start>.+) (?P<end>.+) (?P<elapsed>.+)$"
+                "value": "^(?P<jobid>[0-9]*) (?P<alloccpus>.+) (?P<cputime>.+) (?P<reqmem>.+) (?P<start>.+) (?P<end>.+) (?P<elapsed>.+)$",
+                "requireMatch": true
             },
-            "requireMatch": true,
-            "failFatal": true,
-            "formatFatal": false,
-            "host": "{{loginHost}}",
-            "port": "{{loginPort}}"
+            "connection": "ssh"
         },
         {
             "name": "stop",
-            "async": true,
             "httpMethod": "GET", 
+            "parameters":[
+                {"name": "jobid", "schema": {"type": "integer"}}
+            ],
             "exec": {
-                "parameters":[
-                    {"name": "jobid", "type": "int"}
-                ],
                 "command": "/bin/scancel {{jobid}}"
             },
             "output": null,
-            "requireMatch": false,
-            "failFatal": true,
-            "formatFatal": false,
-            "host": "{{loginHost}}",
-            "port": "{{loginPort}}"
+            "connection": "ssh"
         },
         {
             "name": "running",
-            "async": false,
             "httpMethod": "GET", 
+            "parameters":[
+                {"name": "jobid", "schema": {"type": "integer"}}
+            ],
             "exec": {
-                "parameters":[
-                    {"name": "jobid", "type": "int"}
-                ],
                 "command": "\"/usr/bin/scontrol show job {{jobid}}\""
             },
             "output": {
                 "type": "regex",
-                "value": "JobState=RUNNING"
+                "value": "JobState=RUNNING",
+                "requireMatch": true
             },
-            "requireMatch": true,
-            "failFatal": true,
-            "formatFatal": false,
-            "host": "{{loginHost}}",
-            "port": "{{loginPort}}"
+            "connection": "ssh"
         }
     ]
 }

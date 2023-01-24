@@ -2,11 +2,11 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://github.com/ternaustralia/rs-remote-job/config.schema.json",
     "title": "Endpoints",
-    "description": "JSON configurations for resource server, defining endpoints supported",
+    "description": "YAML configuration settings for resource server, defining endpoints supported",
     "type": "object",
     "properties": {
-      "parameters": {
-        "description": "List of parameters supplied to this resource server",
+      "config": {
+        "description": "Configuration settings for the resource server",
         "type": "array",
         "items": {
           "type": "object",
@@ -18,7 +18,7 @@
               "type": "string",
               "enum": [
                 "string",
-                "int",
+                "integer",
                 "bool",
                 "float",
                 "double"
@@ -37,6 +37,13 @@
         "minItems": 0,
         "uniqueItems": true
       },
+      "statics": {
+        "description": "Static constant definations",
+        "type": "array",
+        "items": {
+          "type": "object"
+        }
+      },
       "endpoints": {
         "description": "List of endpoints supported",
         "type": "array",
@@ -47,9 +54,6 @@
               "type": "string",
               "description": "name of this endpoint"
             },
-            "async": {
-              "type": "boolean"
-            },
             "httpMethod": {
               "type": "string",
               "enum": [
@@ -58,40 +62,57 @@
                 "DELETE"
               ]
             },
+            "parameters": {
+              "type": "array",
+              "description": "List of parameters supplied to the command/endpoint",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": ["string", "boolean", "integer", "number"]
+                      },
+                      "default": {
+                        "type": ["string", "number"]
+                      },
+                      "enum": {
+                        "type": "array",
+                        "items": {
+                          "type": ["string", "number"]
+                        }
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]  
+                  }
+                },
+                "required": [
+                  "name",
+                  "schema"
+                ]
+              },
+              "minItems": 0,
+              "uniqueItems": true
+            },
             "exec": {
               "type": "object",
               "description": "The command to be executed in login host. Command parameters (if any) are replaced with user supplied parameter values, or the corresponding default values",
               "properties": {
-                "parameters": {
-                  "type": "array",
-                  "description": "List of parameters supplied to this command/endpoint",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "string"
-                      },
-                      "default": {
-                        "type": ["string", "number"]
-                      }
-                    },
-                    "required": [
-                      "name",
-                      "type"
-                    ]
-                  },
-                  "minItems": 0,
-                  "uniqueItems": true
-                },
                 "command": {
                   "type": "string"
                 }
               },
               "required": [
-                "parameters",
                 "command"
               ]
             },
@@ -108,39 +129,32 @@
                 },
                 "value": {
                   "type": "string"
+                },
+                "requireMatch": {
+                  "type": "boolean"
                 }
               },
               "required": [
                 "type",
-                "value"
+                "value",
+                "requireMatch"
               ]
             },
-            "requireMatch": {
-              "type": "boolean"
-            },
-            "failFatal": {
-              "type": "boolean"
-            },
-            "formatFatal": {
-              "type": "boolean"
-            },
-            "host": {
-              "type": "string"
-            },
-            "port": {
-              "type": ["string", "integer"]
+            "connection": {
+              "type": "string",
+              "enum": [
+                "ssh", 
+                "local"
+              ]
             }
           },
           "required": [
             "name",
-            "async",
             "httpMethod",
+            "parameters",
+            "exec",
             "output",
-            "requireMatch",
-            "failFatal",
-            "formatFatal",
-            "host",
-            "port"
+            "connection"
           ]
         },
         "minItems": 1,
@@ -148,6 +162,8 @@
       }
     },
     "required": [
+      "config",
+      "statics",
       "endpoints"
     ]
 }
