@@ -1,0 +1,81 @@
+config:
+  - name: ssh_host
+    type: string
+    default: localhost
+  - name: ssh_port
+    type: integer
+    default: 6060
+statics:
+  - description: CoESRA cluster; require a TERN login
+endpoints:
+  - name: command1
+    httpMethod: GET
+    parameters:
+      - name: jobmemory
+        schema:
+          type: integer
+          default: 4
+      - name: jobcpu
+        schema:
+          type: integer
+    exec:
+      command: command1 {{jobmemory}} {{jobcpu}}
+    output:
+      type: regex
+      value: ^Submitted batch job (?P<jobid>(?P<jobidNumber>[0-9]+))$
+      requireMatch: true
+    connection: ssh
+  - name: test_command
+    httpMethod: GET
+    parameters:
+      - name: file
+        schema:
+          type: string
+          default: vim
+      - name: local
+        schema:
+          type: string
+          default: localhost
+      - name: nnp
+        schema:
+          type: integer
+          default: '2'
+    exec:
+      command: ls -la ~/ | grep {{file}}
+    output:
+      type: regex
+      value: (vim)
+      requireMatch: true
+    connection: ssh
+  - name: test_post_command
+    httpMethod: POST
+    parameters:
+      - name: file
+        schema:
+          type: string
+          default: vim-yong
+    exec:
+      command: ls -la ~/ | grep {{file}}
+    output:
+      type: regex
+      value: (vim)-(yong)
+      requireMatch: true
+    connection: ssh
+  - name: test_globals
+    httpMethod: POST
+    parameters:
+      - name: login
+        schema:
+          type: string
+          default: different_host_name
+      - name: port
+        schema:
+          type: integer
+          default: '5522'
+    exec:
+      command: '{{login}} {{scancel}} {{squeue}}'
+    output:
+      type: regex
+      value: (vim)
+      requireMatch: true
+    connection: ssh

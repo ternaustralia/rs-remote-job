@@ -1,5 +1,6 @@
 import re
-import json
+import json, yaml
+from jsonschema import validate
 from typing import Dict, List
 from jinja2 import Template
 from paramiko import SSHClient
@@ -41,9 +42,9 @@ def _convert(obj, otype):
     # convert the object to the type specified
     if obj is None:
         return None
-    if otype == "int":
+    if otype == "integer":
         return int(obj)
-    elif otype in ("float", "double"):
+    elif otype == "number":
         return float(obj)
     elif otype == "bool":
         if obj in ['true', 'True', 1, True]:
@@ -54,40 +55,44 @@ def _convert(obj, otype):
     return str(obj)
 
 
-def get_command(cmd: str, qparams: Dict[str, any], config_file:str) -> Dict[str, any]:
+def get_command(cmd: str, qparams: Dict[str, any], config: Dict[str, any]) -> Dict[str, any]:
     """ Return the command with all its parameters and associated values set.
         Parameters:
         cmd: the command to be executed
         qparams: parameters to the command
-        config_file: path to command configuration file
+        config: configuration settings from the yaml config file 
 
         Return
         -------------
         command: Dict[str,any]
     """
-    with open(config_file, 'r') as f1:
-        cmd_config = json.load(f1)
-
     command = dict()
-    for cmditem in cmd_config['endpoints']:
+    for cmditem in config['endpoints']:
         if cmditem['name'] == cmd:
-            params = get_parameters(cmd, qparams, cmditem, cmd_config['parameters'])
+            params = get_parameters(cmd, qparams, cmditem)
             command = json.loads(Template(json.dumps(cmditem)).render(params))
             break
     return command
 
 
-def get_parameters(cmd: str, params: Dict[str, any], cmditem: Dict[str, any], gparams: List) -> Dict[str, any]:
+def get_parameters(cmd: str, params: Dict[str, any], cmditem: Dict[str, any]) -> Dict[str, any]:
     """ Validate the command's parameters against the command configuration,
         and return all the parameters required for the command.
     """
 
     # Get all the command parameters, and fill it with default values if not specified
     parameters = dict()
-    cmd_pnames = [ p['name'] for p in cmditem['exec']['parameters'] ]
-    for p in cmditem['exec']['parameters'] + gparams:
+    cmd_pnames = [ p['name'] for p in cmditem['parameters'] ]
+    for p in cmditem['parameters']:
         pname = p['name']
-        parameters[pname] = _convert(params.get(pname, p.get('default')), p['type'])
+        schema = p['schema']
+
+        # validate against the parameter's schema
+        try:
+            parameters[pname] = _convert(params.get(pname, schema.get('default')), schema['type'])
+            validate(parameters[pname], schema)
+        except Exception as e:
+            raise Exception(f"Invalid parameter '{pname} ({parameters[pname]}): {str(e)}")
 
         # Command parameter must have value
         if pname in cmd_pnames and parameters[pname] is None:

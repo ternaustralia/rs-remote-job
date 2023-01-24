@@ -1,9 +1,9 @@
 import os
 import pytest
+import yaml
 import mock_ssh_server
 import requests
 
-import json
 from pathlib import Path
 from flask_tern.testing.fixtures import basic_auth as base_auth  # noqa
 from flask_tern.testing.fixtures import cache_spec, monkeypatch_session  # noqa
@@ -12,17 +12,21 @@ from resource_server import create_app
 
 @pytest.fixture
 def cmds_path_config():
-    """Return path to cmds.json config file."""
-    return str(Path(__file__).with_name("cmds.json"))
+    """Return path to cmds.yaml config file."""
+    return str(Path(__file__).with_name("cmds.yaml"))
 
 
 @pytest.fixture
-def command_test_item(cmds_path_config):
-    """Return a command item with name 'command1'"""
+def command_test_config(cmds_path_config):
+    """Return configuration settings of config yaml file'"""
     with open(cmds_path_config) as f1:
-        config = json.load(f1)
+        config = yaml.safe_load(f1)
+    return config
 
-    for cmditem in config['endpoints']:
+@pytest.fixture
+def command_test_item(command_test_config):
+    """Return a command item with name 'command1'"""
+    for cmditem in command_test_config['endpoints']:
         if cmditem['name'] == 'command1':
             return cmditem
 
@@ -68,7 +72,7 @@ def client(app, basic_auth):  # noqa
 
 @pytest.fixture(scope="session")
 def ssh_server(request):
-    with mock_ssh_server.Server() as server:
+    with mock_ssh_server.Server(port=6060) as server:
         yield server
 
 

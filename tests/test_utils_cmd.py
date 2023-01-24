@@ -4,13 +4,12 @@ from resource_server.utils.common import paramiko_establish_connection
 from resource_server.utils.cmd import execute_command, get_command, get_parameters, _convert
 
 
-def test_execute_command(ssh_server, mock_post_request, cmds_path_config, test_command, base_url):
+def test_execute_command(ssh_server, mock_post_request, command_test_config, test_command, base_url):
     """ Test if is possible to run commands in the remote host """
 
-    command = get_command(test_command, dict(), cmds_path_config )
-    command["port"] = ssh_server.port
+    command = get_command(test_command, dict(), command_test_config)
 
-    ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"], dict())
+    ssh = paramiko_establish_connection(base_url, "user", "localhost", ssh_server.port, dict())
     response = execute_command(ssh, command, "GET")
 
     # Check that command is received is the ssh server
@@ -19,13 +18,12 @@ def test_execute_command(ssh_server, mock_post_request, cmds_path_config, test_c
     assert ssh_server.commands[0] == command['exec']['command']
 
 
-def test_execute_command_post(ssh_server, mock_post_request, cmds_path_config, base_url):
+def test_execute_command_post(ssh_server, mock_post_request, command_test_config, base_url):
     """ Test if is possible to run commands in the remote host """
 
-    command = get_command("test_post_command", dict(), cmds_path_config )
-    command["port"] = ssh_server.port
+    command = get_command("test_post_command", dict(), command_test_config)
 
-    ssh = paramiko_establish_connection(base_url, "user", command["host"], command["port"], dict())
+    ssh = paramiko_establish_connection(base_url, "user", "localhost", ssh_server.port, dict())
     response = execute_command(ssh, command, "POST")
 
     # Check that command is received is the ssh server
@@ -34,17 +32,17 @@ def test_execute_command_post(ssh_server, mock_post_request, cmds_path_config, b
     assert ssh_server.commands[0] == command['exec']['command']
 
 
-def test_get_command(cmds_path_config):
+def test_get_command(command_test_config):
     """ Get the command with the specified parameters """
     p1 = {
         'jobmemory': 10,
         'jobcpu': 3
     }
-    commanditem = get_command('command1', p1, cmds_path_config)
+    commanditem = get_command('command1', p1, command_test_config)
 
     # Check that command are set with the associated parameters
     assert commanditem['exec']['command'] == f"command1 {p1['jobmemory']} {p1['jobcpu']}"
-    assert commanditem['host'] == '127.0.0.1'  # match to the parameter 'login' in config file
+    assert commanditem['connection'] == 'ssh'
 
 
 def test_get_parameters(command_test_item):
@@ -53,21 +51,16 @@ def test_get_parameters(command_test_item):
         'jobmemory': 10,
         'jobcpu': 3
     }
-    gparams = [
-        {"name": "loginHost", "type": "string", "default": "login-node-ip"},
-        {"name": "loginPort", "type": "int", "default": 4000}
-    ]
-    params = get_parameters('command1', p1, command_test_item, gparams)
+    params = get_parameters('command1', p1, command_test_item)
 
     # Check for pass-in values are set in parameters
-    expected_params = {'loginHost': "login-node-ip", "loginPort": 4000}
-    expected_params.update(p1)
+    expected_params = p1
     assert params == expected_params
 
 
 def test_get_parameters_default(command_test_item):
     # Test default parameter value
-    params = get_parameters('command1', {'jobcpu': 2}, command_test_item, gparams=[])
+    params = get_parameters('command1', {'jobcpu': 2}, command_test_item)
 
     # Check that the parameter jobmemory has default value of 4
     expected_params = {'jobmemory': 4, 'jobcpu': 2}
@@ -77,7 +70,7 @@ def test_get_parameters_default(command_test_item):
 def test_get_parameters_missing_param(command_test_item):
     # Check that exception is raised for missing parameter
     with pytest.raises(Exception) as e1:
-        params = get_parameters('command1', {}, command_test_item, gparams=[])
+        params = get_parameters('command1', {}, command_test_item)
         assert e1.value.args[0] == "Missing parameter 'jobcpu' for command command1"
 
 
@@ -85,13 +78,11 @@ def test_convert():
     # Test _convert converts type properly
     vars = [
         ('string', 'string-value', 'string-value'),
-        ('int', 100, 100),
-        ('int', '101', 101),
-        ('int', 100.9, 100),
-        ('float', 1.6, 1.6),
-        ('float', '1.6', 1.6),
-        ('double', 1.766, 1.766),
-        ('double', '1.766', 1.766),
+        ('integer', 100, 100),
+        ('integer', '101', 101),
+        ('integer', 100.9, 100),
+        ('number', 1.766, 1.766),
+        ('number', '1.766', 1.766),
         ('bool', 1, True),
         ('bool', 'true', True),
         ('bool', 'True', True),

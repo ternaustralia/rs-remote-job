@@ -114,7 +114,7 @@ class Server:
                 t.start()
 
     def __exit__(self, *exc_info):
-        print("existing and close socket for server")
+        print("exiting and close socket for server")
         try:
             self._socket.shutdown(socket.SHUT_RDWR)
             self._socket.close()
