@@ -9,5 +9,5 @@ def test_paramiko_establish_connection(ssh_server, mock_post_request, base_url, 
 
     command = get_command(test_command, dict(), command_test_config)
     
-    ssh = paramiko_establish_connection(base_url, "user", "localhost", ssh_server.port, dict())
+    ssh = paramiko_establish_connection(base_url, "user", "localhost", ssh_server.port)
     assert isinstance(ssh, paramiko.SSHClient)

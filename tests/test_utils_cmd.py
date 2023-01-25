@@ -9,7 +9,7 @@ def test_execute_command(ssh_server, mock_post_request, command_test_config, tes
 
     command = get_command(test_command, dict(), command_test_config)
 
-    ssh = paramiko_establish_connection(base_url, "user", "localhost", ssh_server.port, dict())
+    ssh = paramiko_establish_connection(base_url, "user", "localhost", ssh_server.port)
     response = execute_command(ssh, command, "GET")
 
     # Check that command is received is the ssh server
@@ -23,7 +23,7 @@ def test_execute_command_post(ssh_server, mock_post_request, command_test_config
 
     command = get_command("test_post_command", dict(), command_test_config)
 
-    ssh = paramiko_establish_connection(base_url, "user", "localhost", ssh_server.port, dict())
+    ssh = paramiko_establish_connection(base_url, "user", "localhost", ssh_server.port)
     response = execute_command(ssh, command, "POST")
 
     # Check that command is received is the ssh server
@@ -75,7 +75,7 @@ def test_get_parameters_missing_param(command_test_item):
 
 
 def test_convert():
-    # Test _convert converts type properly
+    # Test _convert converts simple types properly
     vars = [
         ('string', 'string-value', 'string-value'),
         ('integer', 100, 100),
@@ -83,14 +83,14 @@ def test_convert():
         ('integer', 100.9, 100),
         ('number', 1.766, 1.766),
         ('number', '1.766', 1.766),
-        ('bool', 1, True),
-        ('bool', 'true', True),
-        ('bool', 'True', True),
-        ('bool', True, True),
-        ('bool', 0, False),
-        ('bool', 'false', False),
-        ('bool', 'False', False),
-        ('bool', False, False)
+        ('boolean', 1, True),
+        ('boolean', 'true', True),
+        ('boolean', 'True', True),
+        ('boolean', True, True),
+        ('boolean', 0, False),
+        ('boolean', 'false', False),
+        ('boolean', 'False', False),
+        ('boolean', False, False)
     ]
 
     # Check that the converted value is as expected

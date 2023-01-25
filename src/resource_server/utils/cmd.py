@@ -46,7 +46,7 @@ def _convert(obj, otype):
         return int(obj)
     elif otype == "number":
         return float(obj)
-    elif otype == "bool":
+    elif otype == "boolean":
         if obj in ['true', 'True', 1, True]:
             return True
         if obj in ['false', 'False', 0, False]:

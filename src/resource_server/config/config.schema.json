@@ -19,12 +19,12 @@
               "enum": [
                 "string",
                 "integer",
-                "bool",
+                "boolean",
                 "number"
               ]
             },
             "default": {
-                "type": ["string", "number"]
+                "type": ["string", "number", "integer", "boolean"]
             }
           },
           "required": [
@@ -47,7 +47,7 @@
         "description": "List of endpoints supported",
         "type": "array",
         "items": {
-          "type": ["string", "number", "boolean", "object"],
+          "type": "object",
           "properties": {
             "name": {
               "type": "string",

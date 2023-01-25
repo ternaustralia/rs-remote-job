@@ -87,7 +87,7 @@ def get_keys():
 
 @pytest.fixture
 def mock_post_request(monkeypatch, get_keys):
-    def _post_request(url, json, headers):
+    def _post_request(url, json):
         base_name = os.path.basename(url)
 
         if base_name == 'generate':

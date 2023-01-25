@@ -23,6 +23,18 @@ def test_cmd_test_command(client, basic_auth, mock_post_request, ssh_server, tes
     assert response.json['message'] == ['vim']
 
 
+def test_cmd_test_command_with_service_role(client, basic_auth, mock_post_request, ssh_server, test_command):
+    # Execute a test command using GET method
+    response = client.get(
+        f"/api/v1.0/cmd/{test_command}?ssh_port={ssh_server.port}&username=service",
+        headers={"Authorization": basic_auth["service"].auth},
+    )
+
+    # Check that it is successful and output is as expected
+    assert response.status_code == 200
+    assert response.json['message'] == ['vim']
+
+
 def test_cmd_post_test_command(client, basic_auth, mock_post_request, ssh_server):
     # Execute a test command using POST method
     response = client.post(
@@ -31,6 +43,21 @@ def test_cmd_post_test_command(client, basic_auth, mock_post_request, ssh_server
             "file": "vim-yong-blah",
         },
         headers={"Authorization": basic_auth["user"].auth},
+    )
+    # Check that it is successful and output is as expected
+    assert response.status_code == 200
+    assert response.json['message'] == ['vim', 'yong']
+
+
+def test_cmd_post_test_command_with_service_role(client, basic_auth, mock_post_request, ssh_server):
+    # Execute a test command using POST method
+    response = client.post(
+        "/api/v1.0/cmd/test_post_command",
+        json={
+            "file": "vim-yong-blah",
+            "username": "service"
+        },
+        headers={"Authorization": basic_auth["service"].auth},
     )
     # Check that it is successful and output is as expected
     assert response.status_code == 200

@@ -32,7 +32,7 @@ class Handler(paramiko.ServerInterface):
         # TODO: check pkey for username
         # import ipdb; ipdb.set_trace()
         if (
-            username == 'user' and
+            username in ('user', 'service') and
             # TODO: should verify signature somehow ?
             key.public_blob.key_type == 'ssh-rsa-cert-v01@openssh.com'
         ):
