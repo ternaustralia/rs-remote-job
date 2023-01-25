@@ -39,7 +39,7 @@ endpoints:
       - name: nnp
         schema:
           type: integer
-          default: '2'
+          default: 2
     exec:
       command: ls -la ~/ | grep {{file}}
     output:
@@ -71,7 +71,7 @@ endpoints:
       - name: port
         schema:
           type: integer
-          default: '5522'
+          default: 5522
     exec:
       command: '{{login}} {{scancel}} {{squeue}}'
     output:
